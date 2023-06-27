@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @Author Qinghan Huang
  * @Date 2023/6/26 21:56
@@ -19,6 +17,6 @@ public class RedisTest {
     StringRedisTemplate template;
     @Test
     public void test(){
-        template.opsForValue().set("www","test",3, TimeUnit.MINUTES);
+        template.opsForValue().set("qqq","test");
     }
 }
