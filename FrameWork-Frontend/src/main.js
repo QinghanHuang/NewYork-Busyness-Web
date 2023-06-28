@@ -15,8 +15,8 @@ const app = createApp(App)
 //without security rule config now just use 80
 
 // axios.defaults.baseURL='http://137.43.49.76'
-// axios.defaults.baseURL='http://localhost:8080'
-axios.defaults.baseURL='http://8.208.88.52:8080'
+axios.defaults.baseURL='http://localhost:8080'
+// axios.defaults.baseURL='http://8.208.88.52:8080'
 
 app.use(createPinia())
 app.use(router)
