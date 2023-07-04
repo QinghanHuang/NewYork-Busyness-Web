@@ -9,7 +9,7 @@ public class Poi {
     private String id;
     private String name;
     private Location location;
-    private String busy;
+    private int busy;
 
     @Data
     public class Location{
