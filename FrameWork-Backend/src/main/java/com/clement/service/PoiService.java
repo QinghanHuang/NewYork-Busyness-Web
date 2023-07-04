@@ -1,11 +1,12 @@
 package com.clement.service;
 
 import com.clement.pojo.Poi;
+import com.clement.pojo.PoiInfo;
 
 import java.util.List;
 
 public interface PoiService {
-    public Poi getPoiById(int pid);
+    public PoiInfo getPoiInfoById(String id);
 
     public List<Poi> getAllPoi();
 }

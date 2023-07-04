@@ -1,6 +1,7 @@
 package com.clement.controller;
 
 import com.clement.pojo.Poi;
+import com.clement.pojo.PoiInfo;
 import com.clement.service.PoiService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,10 @@ public class PoiController {
 
     @GetMapping
     public List<Poi> getPoi(){
-        System.out.println(poiService.getAllPoi());
         return poiService.getAllPoi();
     }
-    @GetMapping("/{pid}")
-    public Poi getPoiById(@PathVariable("pid") int pid){
-        return poiService.getPoiById(pid);
+    @GetMapping("/{id}")
+    public PoiInfo getPoiInfoById(@PathVariable("id") String id){
+        return poiService.getPoiInfoById(id);
     }
-
-
-
-
 }
