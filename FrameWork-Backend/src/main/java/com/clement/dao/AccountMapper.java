@@ -28,4 +28,15 @@ public interface AccountMapper {
 
     @Update("update account set password=#{password}  where email=#{email}")
     int resetPassword( @Param("email") String email,@Param("password") String password);
+
+
+    @Update("UPDATE account_detail SET " +
+            "name = #{name}, " +
+            "birthday = #{birthday}, " +
+            "introduction = #{introduction}, " +
+            "gender = #{gender}, " +
+            "phone_number = #{phoneNumber}, " +
+            "avatar = #{avatar} " +
+            "WHERE username = #{username} AND email = #{email}")
+    int UpdateAccountDetailByUsernameOrEmail(AccountDetail accountDetail);
 }

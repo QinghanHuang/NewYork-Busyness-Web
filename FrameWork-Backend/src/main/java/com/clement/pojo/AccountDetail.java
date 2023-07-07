@@ -1,6 +1,10 @@
 package com.clement.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.sql.Date;
 
 /**
  * @Author Qinghan Huang
@@ -9,11 +13,19 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountDetail {
-    int id;
-    String username;
-    String email;
-    String phoneNumber;
-    String birthDate;
+    private int id;
+    private String name;
+    private Date birthday;
+    private String introduction;
+    private String gender;
+    private String username;
+    private String email;
+    private String phoneNumber;
+    private int avatar;
+
+
 
 }
