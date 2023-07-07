@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class Poi {
-    private String id;
+    private int id;
     private String name;
     private Location location;
     private int busy;

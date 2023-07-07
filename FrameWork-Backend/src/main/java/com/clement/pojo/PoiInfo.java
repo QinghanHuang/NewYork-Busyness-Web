@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class PoiInfo {
-    private String id;
+    private int id;
     private String name;
     private String detailedLocation;
     private OpenTime openTime;
