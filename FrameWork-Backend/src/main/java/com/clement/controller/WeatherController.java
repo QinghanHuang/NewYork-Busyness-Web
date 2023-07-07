@@ -1,17 +1,17 @@
 package com.clement.controller;
 
-import com.clement.pojo.AccountDetail;
+
 import com.clement.pojo.RestBean;
 import com.clement.pojo.Weather;
-import com.clement.service.WeatherService;
+
 import com.clement.service.impl.WeatherServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
+
 
 import java.util.List;
 
@@ -34,9 +34,10 @@ public class WeatherController {
             return RestBean.succcess(forecastWeathers);
 
         } catch (JsonProcessingException e) {
-            return RestBean.failure(500,null);
+            return RestBean.failure(500, null);
         }
     }
+
     @GetMapping("/current")
     public RestBean<Weather> weatherCurrent() {
         try {
@@ -44,10 +45,9 @@ public class WeatherController {
             return RestBean.succcess(weather);
 
         } catch (JsonProcessingException e) {
-            return RestBean.failure(500,null);
+            return RestBean.failure(500, null);
         }
     }
-
 
 
 }

@@ -1,9 +1,12 @@
 package com.clement;
 
 import com.clement.dao.AccountMapper;
+import com.clement.pojo.AccountDetail;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.sql.Date;
 
 /**
  * @Author Qinghan Huang
@@ -17,7 +20,10 @@ public class MapperTest {
     AccountMapper accountMapper;
     @Test
     public void test(){
-        accountMapper.findAccountDetailByUsernameOrEmail("TEST123");
+        AccountDetail clement = accountMapper.findAccountDetailByUsernameOrEmail("clement");
+        clement.setAvatar(2);
+        clement.setBirthday(Date.valueOf("2001-08-18"));
+        accountMapper.UpdateAccountDetailByUsernameOrEmail(clement);
 
     }
 }
