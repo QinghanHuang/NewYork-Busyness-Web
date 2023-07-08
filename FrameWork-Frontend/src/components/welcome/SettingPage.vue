@@ -143,11 +143,12 @@ const onSubmit = () => {
     },
     (message) => {
       ElMessage.success(message);
+      router.push("/func");
     },
     (message) => console.log(message)
   );
 
-  router.push("/func");
+
 };
 
 const back = () => router.push("/func");

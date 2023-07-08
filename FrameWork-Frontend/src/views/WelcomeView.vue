@@ -40,9 +40,14 @@ const infoStyle = ref({});
 const zoomStyle = ref({});
 const typeChooseStyle = ref({});
 const mapChooseStyle = ref({});
+const searchAreaStyle = ref({});
 
 watchEffect(() => {
   const isSmall = isSmallScreen.value;
+  searchAreaStyle.value = {
+    left: infoWindowShow.value ? (isSmall ? "": "-20%") : "",
+    top: isSmall ? "2%": "2.5%"
+  };
   mapChooseStyle.value = {
     display: "flex",
     flexWrap: "wrap",
@@ -74,13 +79,13 @@ watchEffect(() => {
   };
   inputStyle.value = {
     position: "relative",
-    left: isSmall ? "4.5%" : "",
+    left: isSmall ? "8%" : "",
     width: isSmall ? "75vw" : "300px",
   };
   buttonStyle.value = {
     position: "relative",
     top: isSmall ? "10px" : "",
-    left: isSmall ? "3.8%" : "",
+    left: isSmall ? "7%" : "",
     marginLeft: isSmall ? "7px" : "",
     width: isSmall ? "37vw" : "",
   };
@@ -390,7 +395,7 @@ onUnmounted(() => {
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
       <!-- search area -->
-      <div class="search-area">
+      <div class="search-area" :style="searchAreaStyle">
         <el-input
           :style="inputStyle"
           v-model="searchTerm"
@@ -544,13 +549,12 @@ onUnmounted(() => {
     .open-side-bar-button {
       position: fixed;
       top: 17px;
-      left: 1%;
+      left: 10px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
       z-index: 2;
     }
     .search-area {
       position: absolute;
-      top: 2%;
       z-index: 1;
       display: flex;
       justify-content: center;
