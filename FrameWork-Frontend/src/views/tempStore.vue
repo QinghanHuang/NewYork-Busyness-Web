@@ -2,6 +2,7 @@
 import { CloseBold, Expand, Minus, Plus, DArrowRight } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watchEffect, Transition, computed } from "vue";
 import { useStore } from "vuex";
+import { get } from "@/net/axios";
 import { throttle, debounce } from "lodash";
 import infoPage from "../components/welcome/infoPage.vue";
 
@@ -26,6 +27,7 @@ let autocomplete;
 let mapOptions;
 let heatMapObj;
 let mapInfoWindow;
+let dataList;
 
 // style edit
 const inputStyle = ref({});
@@ -40,12 +42,13 @@ watchEffect(() => {
   const isSmall = isSmallScreen.value;
   mapChooseStyle.value = {
     display: "flex",
-    flexDirection: isSmall ? "column" : "row",
+    flexWrap: "wrap",
+    width: isSmall ? "10vw" : "",
+    alignItems: isSmall ? "left" : "center",
+    justifyContent: isSmall ? "left" : "center",
     position: "absolute",
-    bottom: isSmall ? "400px" : "20px",
-    left: "20px",
-    alignItems: "center",
-    justifyContent: "center",
+    bottom: isSmall ? (infoWindowShow.value ? "40vh" : "5px") : "20px",
+    left: isSmall ? "5px" : "20px",
   };
   zoomStyle.value = {
     flexDirection: isSmall ? "column" : "row",
@@ -119,47 +122,12 @@ const geocode = (request) => {
 };
 
 // set marker
-const setMarkers = () => {
+ const setMarkers = async () => {
+
   // get data
-  const dataList = [
-    {
-      id: "01",
-      name: "central park",
-      location: {
-        lng: -73.9656,
-        lat: 40.7826,
-      },
-      busy: 5,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.758,
-      },
-      busy: 3,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.91,
-        lat: 40.758,
-      },
-      busy: 4,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.728,
-      },
-      busy: 2,
-    },
-  ];
-  store.commit("setPoiInfo", data);
+  await get("/api/poi", (message) => {
+    dataList = message;
+  });
 
   const colorDict = {
     1: "green",
@@ -177,6 +145,7 @@ const setMarkers = () => {
     5: "Explore the iconic landmarks and must-see attractions of this bustling metropolis, but be ready for large crowds and queues.",
   };
 
+  console.log(dataList);
   dataList.forEach((data) => {
     const busyLevel = data.busy;
     const color = colorDict[busyLevel];
@@ -205,7 +174,7 @@ const setMarkers = () => {
     });
 
     // click info window
-    const contentString = `<div style="position: relative; top: -15px; width:200px;height:90px">
+    const contentString = `<div style="position: relative; top: -15px; width:200px;height:90px;">
     <h3>${data.name}</h3>
 
         <p>${adviseDict[data.busy]}</p></div>
@@ -224,47 +193,13 @@ const setMarkers = () => {
 };
 
 // set heatMap
-const setHeatMap = () => {
-  const dataList = [
-    {
-      id: "01",
-      name: "central park",
-      location: {
-        lng: -73.9656,
-        lat: 40.7826,
-      },
-      busy: 5,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.758,
-      },
-      busy: 3,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.91,
-        lat: 40.758,
-      },
-      busy: 4,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.728,
-      },
-      busy: 2,
-    },
-  ];
-  store.commit("setPoiInfo", data);
+const setHeatMap = async () => {
+  await get("/api/poi", (message) => {
+    dataList = message;
+  });
+
   const tempData = [];
+
   dataList.forEach((data) => {
     tempData.push({
       location: new google.maps.LatLng(data.location.lat, data.location.lng),
@@ -276,8 +211,7 @@ const setHeatMap = () => {
 
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
-    dissipating: true,
-    radius: 60,
+    radius: 15,
   });
 };
 
@@ -467,6 +401,7 @@ onUnmounted(() => {
           plain
           disabled
           type="info"
+          size="small"
           style="
             color: black;
             background-color: white;
@@ -476,13 +411,25 @@ onUnmounted(() => {
           "
           >MAP STYLE</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypePlain" type="info" size="large"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypePlain"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Plain</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeMarker" type="info" size="large"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypeMarker"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Markers</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeHeat" type="info" size="large"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypeHeat"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Heatmap</el-button
         >
       </div>
@@ -570,11 +517,12 @@ onUnmounted(() => {
   }
 
   .map-view {
+    position: fixed;
     width: 100%;
     overflow-x: hidden;
     .open-side-bar-button {
-      position: absolute;
-      top: 2%;
+      position: fixed;
+      top: 17px;
       left: 1%;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
       z-index: 2;
@@ -585,7 +533,7 @@ onUnmounted(() => {
       z-index: 1;
       display: flex;
       justify-content: center;
-      width: 100%;
+      width: 100vw;
       flex-wrap: wrap;
       .search-input {
         border-radius: 4px;
@@ -653,6 +601,7 @@ onUnmounted(() => {
   }
 
   .info-style {
+    background-color: white;
     position: absolute;
     width: 500px;
     height: 100vh;

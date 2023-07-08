@@ -49,11 +49,12 @@
 </template>
 
 <script setup>
+import { post, get } from "@/net/axios";
 import { ref, defineProps, watchEffect, onMounted, computed } from "vue";
 import { SuccessFilled, WarningFilled, CircleCloseFilled, Minus } from "@element-plus/icons-vue";
 import { useStore } from "vuex";
 
-let data ;
+let data;
 const locationName = ref("");
 const locationID = computed(() => store.state.locationID);
 const value = ref();
@@ -79,48 +80,55 @@ watchEffect(() => {
   };
 
   const ID = locationID.value;
-  if (ID === "01") {
-    data = {
-      id: "01",
-      name: "central park",
-      detailedLocation: "New York, NY, United States",
-      openTime: {
-        open: "6:00",
-        close: "1:00",
-      },
-      busy: 5,
-      img: [
-        "https://upload.wikimedia.org/wikipedia/commons/1/13/Central_Park_-_The_Pond_%2848377220157%29.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/26_-_New_York_-_Octobre_2008.jpg/1280px-26_-_New_York_-_Octobre_2008.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/f/f9/Centralpark_fg01.jpg",
-      ],
-      introduction:
-        "Sprawling park with pedestrian paths & ballfields, plus a zoo, carousel, boat rentals & a reservoir.",
-    };
-  } else if (ID === "02") {
-    data = {
-      id: "02",
-      name: "time square",
-      detailedLocation: "199 W 45th St, New York, NY 10036, United States",
-      openTime: {
-        open: "11:00",
-        close: "20:00",
-      },
-      busy: 3,
-      img: [
-        "https://upload.wikimedia.org/wikipedia/commons/4/47/New_york_times_square-terabass.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/c/c0/1_times_square_night_2013.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/6/6d/Times_Square_--_February_1965.jpg",
-      ],
-      introduction:
-        "Times Square is a major commercial intersection, tourist destination, and entertainment hub in New York City, United States.",
-    };
-  }
-  locationName.value = data.name;
-  value.value = data.busy;
-  urls.value = data.img;
-});
+  const url = `/api/poi/${ID}`;
+  get(url, (res) => {
+    data = res;
+    locationName.value = data.name;
+    value.value = data.busy;
+    urls.value = data.img;
+  });
 
+  // if (ID === 1) {
+  //   data = {
+  //     id: "01",
+  //     name: "central park",
+  //     detailedLocation: "New York, NY, United States",
+  //     openTime: {
+  //       open: "6:00",
+  //       close: "1:00",
+  //     },
+  //     busy: 5,
+  //     img: [
+  //       "https://upload.wikimedia.org/wikipedia/commons/1/13/Central_Park_-_The_Pond_%2848377220157%29.jpg",
+  //       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/26_-_New_York_-_Octobre_2008.jpg/1280px-26_-_New_York_-_Octobre_2008.jpg",
+  //       "https://upload.wikimedia.org/wikipedia/commons/f/f9/Centralpark_fg01.jpg",
+  //     ],
+  //     introduction:
+  //       "Sprawling park with pedestrian paths & ballfields, plus a zoo, carousel, boat rentals & a reservoir.",
+  //   };
+  // } else if (ID === "02") {
+  //   data = {
+  //     id: "02",
+  //     name: "time square",
+  //     detailedLocation: "199 W 45th St, New York, NY 10036, United States",
+  //     openTime: {
+  //       open: "11:00",
+  //       close: "20:00",
+  //     },
+  //     busy: 3,
+  //     img: [
+  //       "https://upload.wikimedia.org/wikipedia/commons/4/47/New_york_times_square-terabass.jpg",
+  //       "https://upload.wikimedia.org/wikipedia/commons/c/c0/1_times_square_night_2013.jpg",
+  //       "https://upload.wikimedia.org/wikipedia/commons/6/6d/Times_Square_--_February_1965.jpg",
+  //     ],
+  //     introduction:
+  //       "Times Square is a major commercial intersection, tourist destination, and entertainment hub in New York City, United States.",
+  //   };
+  // }
+  // locationName.value = data.name;
+  // value.value = data.busy;
+  // urls.value = data.img;
+});
 
 const clear = () => store.commit("setInfoWindowShow", false);
 </script>

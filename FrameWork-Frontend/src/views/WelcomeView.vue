@@ -2,6 +2,8 @@
 import { CloseBold, Expand, Minus, Plus, DArrowRight } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watchEffect, Transition, computed } from "vue";
 import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
+import { get } from "@/net/axios";
 import { throttle, debounce } from "lodash";
 import infoPage from "../components/welcome/infoPage.vue";
 
@@ -26,6 +28,9 @@ let autocomplete;
 let mapOptions;
 let heatMapObj;
 let mapInfoWindow;
+let dataList;
+let locaitonID;
+let isPlain;
 
 // style edit
 const inputStyle = ref({});
@@ -40,13 +45,13 @@ watchEffect(() => {
   const isSmall = isSmallScreen.value;
   mapChooseStyle.value = {
     display: "flex",
-    flexWrap:"wrap",
-    width:isSmall?"10vw":"",
+    flexWrap: "wrap",
+    width: isSmall ? "10vw" : "",
     alignItems: isSmall ? "left" : "center",
     justifyContent: isSmall ? "left" : "center",
     position: "absolute",
-    bottom: isSmall ? infoWindowShow.value ? "40vh": "5px" : "20px",
-    left: isSmall ?"5px":"20px",
+    bottom: isSmall ? (infoWindowShow.value ? "40vh" : "5px") : "20px",
+    left: isSmall ? "5px" : "20px",
   };
   zoomStyle.value = {
     flexDirection: isSmall ? "column" : "row",
@@ -89,6 +94,7 @@ watchEffect(() => {
 // map relative
 const zoomIn = () => map.setZoom(map.getZoom() + 1);
 const zoomOut = () => map.setZoom(map.getZoom() - 1);
+
 const search = () => {
   geocode({
     address: searchTerm.value.includes(",")
@@ -96,12 +102,25 @@ const search = () => {
       : searchTerm.value.toLowerCase(),
   });
 };
+
 const clear = () => {
+  mapInfoWindow.close();
   store.commit("setInfoWindowShow", false);
   marker.setMap(null);
+  searchTerm.value = "";
 };
+
+const getIdByName = (name) => {
+  const foundItem = dataList.find((item) => item.name === name);
+  return foundItem ? foundItem.id : null;
+};
+
 const geocode = (request) => {
-  clear();
+  if (!request.address) return;
+
+  mapInfoWindow.close();
+  store.commit("setInfoWindowShow", false);
+
   geocoder
     .geocode(request)
     .then((result) => {
@@ -112,60 +131,23 @@ const geocode = (request) => {
       searchTerm.value = results[0].formatted_address.includes(",")
         ? results[0].formatted_address.match(/^[^,]+/)?.[0].toLowerCase()
         : results[0].formatted_address.toLowerCase();
+
+      locaitonID = getIdByName(searchTerm.value);
+      if (locaitonID) showLocInfo(locaitonID);
+
       return results;
     })
     .catch((e) => {
-      alert("Geocode was not successful for the following reason: " + e);
+      ElMessage.warning("Geocode was not successful for the following reason: " + e);
     });
 };
 
 // set marker
-const setMarkers = () => {
+const setMarkers = async () => {
   // get data
-
-  get("/api/poi", (message) => {
-  console.log(message)
-  
-});
-  const dataList = [
-    {
-      id: "01",
-      name: "central park",
-      location: {
-        lng: -73.9656,
-        lat: 40.7826,
-      },
-      busy: 5,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.758,
-      },
-      busy: 3,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.91,
-        lat: 40.758,
-      },
-      busy: 4,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.728,
-      },
-      busy: 2,
-    },
-  ];
-  store.commit("setPoiInfo", data);
+  await get("/api/poi", (message) => {
+    dataList = message;
+  });
 
   const colorDict = {
     1: "green",
@@ -221,8 +203,7 @@ const setMarkers = () => {
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
       map.panTo(data.location);
-      store.commit("setLocationID", data.id);
-      store.commit("setInfoWindowShow", true);
+      showLocInfo(data.id);
     });
 
     markerList.push(customMarker);
@@ -230,47 +211,13 @@ const setMarkers = () => {
 };
 
 // set heatMap
-const setHeatMap = () => {
-  const dataList = [
-    {
-      id: "01",
-      name: "central park",
-      location: {
-        lng: -73.9656,
-        lat: 40.7826,
-      },
-      busy: 5,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.758,
-      },
-      busy: 3,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.91,
-        lat: 40.758,
-      },
-      busy: 4,
-    },
-    {
-      id: "02",
-      name: "times square",
-      location: {
-        lng: -73.9855,
-        lat: 40.728,
-      },
-      busy: 2,
-    },
-  ];
-  store.commit("setPoiInfo", data);
+const setHeatMap = async () => {
+  await get("/api/poi", (message) => {
+    dataList = message;
+  });
+
   const tempData = [];
+
   dataList.forEach((data) => {
     tempData.push({
       location: new google.maps.LatLng(data.location.lat, data.location.lng),
@@ -278,11 +225,9 @@ const setHeatMap = () => {
     });
   });
 
-  console.log(tempData);
-
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
-    radius: 10,
+    radius: 15,
   });
 };
 
@@ -307,20 +252,30 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 // show heatmap
 const showHeatmap = () => heatMapObj.setMap(map);
 
+// show poi location info
+const showLocInfo = (id) => {
+  store.commit("setLocationID", id);
+  store.commit("setInfoWindowShow", true);
+  if (!isPlain) marker.setMap(null);
+};
+
 // map type choose
 const mapTypePlain = () => {
   disappearHeatmap();
   disappearMarkers();
+  isPlain = true;
 };
 
 const mapTypeMarker = () => {
   disappearHeatmap();
   showMarkers();
+  isPlain = false;
 };
 
 const mapTypeHeat = () => {
   showHeatmap();
   disappearMarkers();
+  isPlain = false;
 };
 
 // window size relative
@@ -396,11 +351,10 @@ onMounted(() => {
     const place = autocomplete.getPlace();
 
     if (!place.geometry || !place.geometry.location) {
-      // User entered the name of a Place that was not suggested and
-      // pressed the Enter key, or the Place Details request failed.
-      window.alert("No details available for input: '" + place.name + "'");
+      search();
       return;
     }
+
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
@@ -409,17 +363,13 @@ onMounted(() => {
       map.setZoom(17);
     }
     marker.setPosition(place.geometry.location);
-    console.log("auto", place.geometry.location);
     marker.setVisible(true);
-    marker.setMap(map);
-    searchTerm.value = place.name.toLowerCase();
-  });
 
-  // geocode
-  // do not let the user click unuseful info
-  // google.maps.event.addListenerOnce(map, "tilesloaded", () => {
-  //   map.addListener("click", (e) => geocode({ location: e.latLng }));
-  // });
+    searchTerm.value = place.name.toLowerCase();
+    locaitonID = getIdByName(searchTerm.value);
+    if (locaitonID) showLocInfo(locaitonID);
+    else marker.setMap(map);
+  });
 
   // set marker list
   setMarkers();
@@ -482,13 +432,25 @@ onUnmounted(() => {
           "
           >MAP STYLE</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypePlain" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypePlain"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Plain</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeMarker" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypeMarker"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Markers</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeHeat" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button
+          :style="typeChooseStyle"
+          @click="mapTypeHeat"
+          type="info"
+          :size="isSmallScreen ? 'default' : 'large'"
           >Heatmap</el-button
         >
       </div>
