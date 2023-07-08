@@ -40,13 +40,12 @@ watchEffect(() => {
   const isSmall = isSmallScreen.value;
   mapChooseStyle.value = {
     display: "flex",
-    flexWrap:"wrap",
-    width:isSmall?"10vw":"",
-    alignItems: isSmall ? "left" : "center",
-    justifyContent: isSmall ? "left" : "center",
+    flexDirection: isSmall ? "column" : "row",
     position: "absolute",
-    bottom: isSmall ? infoWindowShow.value ? "40vh": "5px" : "20px",
-    left: isSmall ?"5px":"20px",
+    bottom: isSmall ? "400px" : "20px",
+    left: "20px",
+    alignItems: "center",
+    justifyContent: "center",
   };
   zoomStyle.value = {
     flexDirection: isSmall ? "column" : "row",
@@ -122,11 +121,6 @@ const geocode = (request) => {
 // set marker
 const setMarkers = () => {
   // get data
-
-  get("/api/poi", (message) => {
-  console.log(message)
-  
-});
   const dataList = [
     {
       id: "01",
@@ -211,7 +205,7 @@ const setMarkers = () => {
     });
 
     // click info window
-    const contentString = `<div style="position: relative; top: -15px; width:200px;height:90px;">
+    const contentString = `<div style="position: relative; top: -15px; width:200px;height:90px">
     <h3>${data.name}</h3>
 
         <p>${adviseDict[data.busy]}</p></div>
@@ -282,7 +276,8 @@ const setHeatMap = () => {
 
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
-    radius: 10,
+    dissipating: true,
+    radius: 60,
   });
 };
 
@@ -472,7 +467,6 @@ onUnmounted(() => {
           plain
           disabled
           type="info"
-          size="small"
           style="
             color: black;
             background-color: white;
@@ -482,13 +476,13 @@ onUnmounted(() => {
           "
           >MAP STYLE</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypePlain" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button :style="typeChooseStyle" @click="mapTypePlain" type="info" size="large"
           >Plain</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeMarker" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button :style="typeChooseStyle" @click="mapTypeMarker" type="info" size="large"
           >Markers</el-button
         >
-        <el-button :style="typeChooseStyle" @click="mapTypeHeat" type="info" :size="isSmallScreen ? 'default' : 'large'"
+        <el-button :style="typeChooseStyle" @click="mapTypeHeat" type="info" size="large"
           >Heatmap</el-button
         >
       </div>
@@ -576,12 +570,11 @@ onUnmounted(() => {
   }
 
   .map-view {
-    position: fixed;
     width: 100%;
     overflow-x: hidden;
     .open-side-bar-button {
-      position: fixed;
-      top: 17px;
+      position: absolute;
+      top: 2%;
       left: 1%;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
       z-index: 2;
@@ -592,7 +585,7 @@ onUnmounted(() => {
       z-index: 1;
       display: flex;
       justify-content: center;
-      width: 100vw;
+      width: 100%;
       flex-wrap: wrap;
       .search-input {
         border-radius: 4px;
@@ -660,7 +653,6 @@ onUnmounted(() => {
   }
 
   .info-style {
-    background-color: white;
     position: absolute;
     width: 500px;
     height: 100vh;

@@ -1,0 +1,288 @@
+<template>
+  <div class="this">
+    <div class="title" style="position: absolute; top: 1%; margin-left: 2%; color: #343434">
+      <h1>Edit Profile</h1>
+    </div>
+    <div style="margin-top: 5%">
+      <div class="avatar">
+        <el-avatar
+          @click="chooseAvatar"
+          class="avatarImg"
+          :size="100"
+          :src="avatarDict[form.avatar]"
+        />
+        <p class="upload-text" @click="chooseAvatar">click here choose your avatar</p>
+      </div>
+      <el-divider />
+      <el-form :model="form" label-width="100px" class="form">
+        <el-form-item label="Email">
+          <el-input disabled v-model="form.email" class="add-shadow" />
+        </el-form-item>
+        <el-form-item label="User Name">
+          <el-input disabled v-model="form.username" class="add-shadow" />
+        </el-form-item>
+        <el-form-item label="Nick Name">
+          <el-input v-model="form.name" class="add-shadow" />
+        </el-form-item>
+        <el-form-item label="Phone Num">
+          <el-input v-model="form.phoneNumber" class="add-shadow" />
+        </el-form-item>
+        <el-form-item label="Gender">
+          <el-select v-model="form.gender" class="add-shadow">
+            <el-option label="male" value="0" />
+            <el-option label="female" value="1" />
+            <el-option label="others" value="2" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Birthday">
+          <el-col :span="17">
+            <el-date-picker
+              v-model="form.birthday"
+              type="date"
+              style="width: 100%"
+              class="add-shadow"
+            />
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="Introduction">
+          <el-input v-model="form.introduction" type="textarea" class="add-shadow" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">Save</el-button>
+          <el-button @click="back">Cancel</el-button>
+        </el-form-item>
+      </el-form>
+      <div class="choose-avatar" v-if="chooseAvatarShow">
+        <div class="avatar-container">
+          <img
+            v-for="image in images"
+            :key="image.id"
+            :src="image.url"
+            :class="{ 'image-item': true, selected: image.id === selectedImageId }"
+            @click="selectImage(image.id)"
+          />
+        </div>
+        <el-button
+          style="position: relative; left: 50%; transform: translate(-50%, 50%)"
+          @click="getSelectedImageId"
+          type="primary"
+          round
+          size="large"
+          >Choose this!</el-button
+        >
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, onMounted, computed, ref } from "vue";
+import { useStore } from "vuex";
+import router from "@/router";
+import { get, post, postJson } from "@/net/axios";
+import { ElMessage } from "element-plus";
+import { Message, CloseBold, Expand, Minus, Plus } from "@element-plus/icons-vue";
+
+const store = useStore();
+let userID;
+
+// do not use same name with ref
+const form = reactive({
+  name: "",
+  birthday: "",
+  introduction: "",
+  gender: "",
+  username: "",
+  email: "",
+  phoneNumber: "",
+  avatar: "0",
+});
+
+const avatarDict = {
+  0: "https://pic1.zhimg.com/v2-cbe72e398cd76df8e7dc56a8e7b65690_r.jpg",
+  1: "https://pic1.zhimg.com/v2-e95d65e7a8f1c81eb62fc1b9bb74c974_b.jpg",
+  2: "https://pic1.zhimg.com/v2-d2c55e797ab263f88b867f3a7a084b7c_b.jpg",
+  3: "https://pic1.zhimg.com/v2-2d9a18ffdf60a5cfdbd9970b6e410704_b.jpg",
+  4: "https://pic3.zhimg.com/v2-be8de5269326f8051516e9256370b5f2_b.jpg",
+  5: "https://pic3.zhimg.com/v2-2d1841b90bc89033244e1c5431b0e6ea_b.jpg",
+  6: "https://pic1.zhimg.com/v2-dc5b906fb10c7b30ab5ae515c09d656c_b.jpg",
+  7: "https://pic4.zhimg.com/v2-6213cef59cfbc0669984c22307456553_b.jpg",
+  8: "https://pic3.zhimg.com/v2-5d65dee213b179277d489aaf4353b2d6_b.jpg",
+};
+
+const images = ref([
+  { id: 1, url: "https://pic1.zhimg.com/v2-e95d65e7a8f1c81eb62fc1b9bb74c974_b.jpg" },
+  { id: 2, url: "https://pic1.zhimg.com/v2-d2c55e797ab263f88b867f3a7a084b7c_b.jpg" },
+  { id: 3, url: "https://pic1.zhimg.com/v2-2d9a18ffdf60a5cfdbd9970b6e410704_b.jpg" },
+  { id: 4, url: "https://pic1.zhimg.com/v2-be8de5269326f8051516e9256370b5f2_b.jpg" },
+  { id: 5, url: "https://pic1.zhimg.com/v2-2d1841b90bc89033244e1c5431b0e6ea_b.jpg" },
+  { id: 6, url: "https://pic1.zhimg.com/v2-dc5b906fb10c7b30ab5ae515c09d656c_b.jpg" },
+  { id: 7, url: "https://pic1.zhimg.com/v2-6213cef59cfbc0669984c22307456553_b.jpg" },
+  { id: 8, url: "https://pic1.zhimg.com/v2-5d65dee213b179277d489aaf4353b2d6_b.jpg" },
+]);
+
+const selectedImageId = ref(null);
+const chooseAvatarShow = ref(false);
+
+onMounted(() => {
+  get("/api/user/me", (message) => {
+    form.name = message.name;
+    form.birthday = message.birthday;
+    form.introduction = message.introduction;
+    form.gender = message.gender;
+    form.username = message.username;
+    form.email = message.email;
+    form.phoneNumber = message.phoneNumber;
+    form.avatar = message.avatar;
+    userID = message.id;
+  });
+});
+
+const onSubmit = () => {
+  console.log({
+    name: form.name,
+    birthday: form.birthday,
+    introduction: form.introduction,
+    gender: form.gender,
+    phoneNumber: form.phoneNumber,
+    avatar: form.avatar,
+    id: userID,
+  });
+  postJson(
+    "/api/user/me",
+    {
+      name: form.name,
+      birthday: form.birthday,
+      introduction: form.introduction,
+      gender: form.gender,
+      username: form.username,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+      avatar: form.avatar,
+      id: userID,
+    },
+    (message) => {
+      ElMessage.success(message);
+    },
+    (message) => console.log(message)
+  );
+
+  router.push("/func");
+};
+
+const back = () => router.push("/func");
+
+const selectImage = (imageId) => {
+  selectedImageId.value = imageId;
+};
+
+const getSelectedImageId = () => {
+  if (selectedImageId.value !== null) {
+    form.avatar = selectedImageId.value;
+    chooseAvatarShow.value = false;
+  } else {
+    console.log("No image selected.");
+  }
+};
+
+const chooseAvatar = () => (chooseAvatarShow.value = true);
+</script>
+
+<style lang="scss">
+.this {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  position: relative;
+  top: -3%;
+
+  .form {
+    margin-right: 15%;
+    margin-left: 4%;
+
+    @media (max-width: 600px) {
+      margin-top: 50px;
+    }
+  }
+
+  .avatar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 20px;
+    position: relative;
+    left: 7%;
+    bottom: 2%;
+
+    .avatarImg {
+      // box-shadow: 1px 2px 5px rgba(0, 0, 0, 1);
+      img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        object-position: center center;
+      }
+
+      @media (max-width: 600px) {
+        width: 100px;
+        height: 100px;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    p {
+      font-size: larger;
+      color: #a9a9a9;
+      margin-left: 20px;
+      width: 30%;
+
+      &:hover {
+        color: #44849f;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .add-shadow {
+    border-radius: 4px;
+    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .choose-avatar {
+    position: absolute;
+    top: 3%;
+    height: 100vh;
+    background-color: #f7f7f7;
+
+    .avatar-container {
+      padding-top: 15%;
+      width: 100%;
+      height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .image-item {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        object-position: center center;
+        margin-left: 5px;
+
+        margin-right: 5px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .selected {
+        border: 2px solid blue;
+        width: 147px;
+        height: 146px;
+      }
+    }
+  }
+}
+</style>
