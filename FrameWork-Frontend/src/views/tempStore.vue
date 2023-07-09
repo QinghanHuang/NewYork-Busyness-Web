@@ -2,9 +2,11 @@
 import { CloseBold, Expand, Minus, Plus, DArrowRight } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watchEffect, Transition, computed } from "vue";
 import { useStore } from "vuex";
+import { ElMessage } from "element-plus";
 import { get } from "@/net/axios";
 import { throttle, debounce } from "lodash";
-import infoPage from "../components/welcome/infoPage.vue";
+import InfoPage from "../components/welcome/LocInfoPage.vue";
+
 
 // define
 const store = useStore();
@@ -28,6 +30,8 @@ let mapOptions;
 let heatMapObj;
 let mapInfoWindow;
 let dataList;
+let locaitonID;
+let isPlain;
 
 // style edit
 const inputStyle = ref({});
@@ -37,9 +41,15 @@ const infoStyle = ref({});
 const zoomStyle = ref({});
 const typeChooseStyle = ref({});
 const mapChooseStyle = ref({});
+const searchAreaStyle = ref({});
 
 watchEffect(() => {
   const isSmall = isSmallScreen.value;
+  searchAreaStyle.value = {
+    left: infoWindowShow.value ? (isSmall ? "" : "-20%") : "",
+    top: isSmall ? "2%" : "2.5%",
+    transition: "left 0.4s",
+  };
   mapChooseStyle.value = {
     display: "flex",
     flexWrap: "wrap",
@@ -71,13 +81,13 @@ watchEffect(() => {
   };
   inputStyle.value = {
     position: "relative",
-    left: isSmall ? "4.5%" : "",
+    left: isSmall ? "8%" : "",
     width: isSmall ? "75vw" : "300px",
   };
   buttonStyle.value = {
     position: "relative",
     top: isSmall ? "10px" : "",
-    left: isSmall ? "3.8%" : "",
+    left: isSmall ? "7%" : "",
     marginLeft: isSmall ? "7px" : "",
     width: isSmall ? "37vw" : "",
   };
@@ -91,6 +101,7 @@ watchEffect(() => {
 // map relative
 const zoomIn = () => map.setZoom(map.getZoom() + 1);
 const zoomOut = () => map.setZoom(map.getZoom() - 1);
+
 const search = () => {
   geocode({
     address: searchTerm.value.includes(",")
@@ -98,12 +109,25 @@ const search = () => {
       : searchTerm.value.toLowerCase(),
   });
 };
+
 const clear = () => {
+  mapInfoWindow.close();
   store.commit("setInfoWindowShow", false);
   marker.setMap(null);
+  searchTerm.value = "";
 };
+
+const getIdByName = (name) => {
+  const foundItem = dataList.find((item) => item.name === name);
+  return foundItem ? foundItem.id : null;
+};
+
 const geocode = (request) => {
-  clear();
+  if (!request.address) return;
+
+  mapInfoWindow.close();
+  store.commit("setInfoWindowShow", false);
+
   geocoder
     .geocode(request)
     .then((result) => {
@@ -114,16 +138,19 @@ const geocode = (request) => {
       searchTerm.value = results[0].formatted_address.includes(",")
         ? results[0].formatted_address.match(/^[^,]+/)?.[0].toLowerCase()
         : results[0].formatted_address.toLowerCase();
+
+      locaitonID = getIdByName(searchTerm.value);
+      if (locaitonID) showLocInfo(locaitonID);
+
       return results;
     })
     .catch((e) => {
-      alert("Geocode was not successful for the following reason: " + e);
+      ElMessage.warning("Geocode was not successful for the following reason: " + e);
     });
 };
 
 // set marker
- const setMarkers = async () => {
-
+const setMarkers = async () => {
   // get data
   await get("/api/poi", (message) => {
     dataList = message;
@@ -145,7 +172,6 @@ const geocode = (request) => {
     5: "Explore the iconic landmarks and must-see attractions of this bustling metropolis, but be ready for large crowds and queues.",
   };
 
-  console.log(dataList);
   dataList.forEach((data) => {
     const busyLevel = data.busy;
     const color = colorDict[busyLevel];
@@ -184,8 +210,7 @@ const geocode = (request) => {
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
       map.panTo(data.location);
-      store.commit("setLocationID", data.id);
-      store.commit("setInfoWindowShow", true);
+      showLocInfo(data.id);
     });
 
     markerList.push(customMarker);
@@ -206,8 +231,6 @@ const setHeatMap = async () => {
       weight: data.busy,
     });
   });
-
-  console.log(tempData);
 
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
@@ -236,20 +259,30 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 // show heatmap
 const showHeatmap = () => heatMapObj.setMap(map);
 
+// show poi location info
+const showLocInfo = (id) => {
+  store.commit("setLocationID", id);
+  store.commit("setInfoWindowShow", true);
+  if (!isPlain) marker.setMap(null);
+};
+
 // map type choose
 const mapTypePlain = () => {
   disappearHeatmap();
   disappearMarkers();
+  isPlain = true;
 };
 
 const mapTypeMarker = () => {
   disappearHeatmap();
   showMarkers();
+  isPlain = false;
 };
 
 const mapTypeHeat = () => {
   showHeatmap();
   disappearMarkers();
+  isPlain = false;
 };
 
 // window size relative
@@ -279,6 +312,10 @@ const outsideClickFold = (event) => {
 
 // life circle functions
 onMounted(() => {
+  get("/api/weather/forecast", (res) => {
+    console.log(res);
+  });
+
   // adjust side bar size
   handleWindowResize();
   window.addEventListener("resize", handleWindowResize);
@@ -325,11 +362,10 @@ onMounted(() => {
     const place = autocomplete.getPlace();
 
     if (!place.geometry || !place.geometry.location) {
-      // User entered the name of a Place that was not suggested and
-      // pressed the Enter key, or the Place Details request failed.
-      window.alert("No details available for input: '" + place.name + "'");
+      search();
       return;
     }
+
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
@@ -338,17 +374,13 @@ onMounted(() => {
       map.setZoom(17);
     }
     marker.setPosition(place.geometry.location);
-    console.log("auto", place.geometry.location);
     marker.setVisible(true);
-    marker.setMap(map);
-    searchTerm.value = place.name.toLowerCase();
-  });
 
-  // geocode
-  // do not let the user click unuseful info
-  // google.maps.event.addListenerOnce(map, "tilesloaded", () => {
-  //   map.addListener("click", (e) => geocode({ location: e.latLng }));
-  // });
+    searchTerm.value = place.name.toLowerCase();
+    locaitonID = getIdByName(searchTerm.value);
+    if (locaitonID) showLocInfo(locaitonID);
+    else marker.setMap(map);
+  });
 
   // set marker list
   setMarkers();
@@ -369,32 +401,34 @@ onUnmounted(() => {
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
       <!-- search area -->
-      <div class="search-area">
-        <el-input
-          :style="inputStyle"
-          v-model="searchTerm"
-          ref="inputRef"
-          placeholder="Search location"
-          class="search-input"
-          size="large"
-        ></el-input>
-        <el-button
-          :style="buttonStyle"
-          @click="search"
-          type="primary"
-          size="large"
-          class="search-button"
-          >Search</el-button
-        >
-        <el-button
-          :style="buttonStyle"
-          @click="clear"
-          type="success"
-          size="large"
-          class="clear-button"
-          >Clear</el-button
-        >
-      </div>
+
+        <div class="search-area" :style="searchAreaStyle">
+          <el-input
+            :style="inputStyle"
+            v-model="searchTerm"
+            ref="inputRef"
+            placeholder="Search location"
+            class="search-input"
+            size="large"
+          ></el-input>
+          <el-button
+            :style="buttonStyle"
+            @click="search"
+            type="primary"
+            size="large"
+            class="search-button"
+            >Search</el-button
+          >
+          <el-button
+            :style="buttonStyle"
+            @click="clear"
+            type="success"
+            size="large"
+            class="clear-button"
+            >Clear</el-button
+          >
+        </div>
+
       <!-- switch map type -->
       <div :style="mapChooseStyle">
         <el-button
@@ -477,7 +511,7 @@ onUnmounted(() => {
     <transition name="slide-in-left">
       <div v-if="infoWindowShow" class="info-style">
         <div class="infoWindow" :style="infoStyle">
-          <infoPage :isSmall="isSmallScreen"></infoPage>
+          <InfoPage :isSmall="isSmallScreen"></InfoPage>
         </div>
       </div>
     </transition>
@@ -523,18 +557,19 @@ onUnmounted(() => {
     .open-side-bar-button {
       position: fixed;
       top: 17px;
-      left: 1%;
+      left: 10px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
       z-index: 2;
     }
     .search-area {
       position: absolute;
-      top: 2%;
       z-index: 1;
       display: flex;
       justify-content: center;
       width: 100vw;
       flex-wrap: wrap;
+      left:0;
+      transition: left 0.3s ease;
       .search-input {
         border-radius: 4px;
         box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);

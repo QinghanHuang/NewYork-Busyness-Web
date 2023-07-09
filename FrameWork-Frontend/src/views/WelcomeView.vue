@@ -5,7 +5,7 @@ import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/axios";
 import { throttle, debounce } from "lodash";
-import infoPage from "../components/welcome/infoPage.vue";
+import InfoPage from "../components/welcome/LocInfoPage.vue";
 
 // define
 const store = useStore();
@@ -19,7 +19,6 @@ const overlayRef = ref(null);
 const showOverlay = ref(false);
 const searchTerm = ref("");
 const markerList = [];
-let data;
 let geocoder;
 let map;
 let marker;
@@ -45,8 +44,9 @@ const searchAreaStyle = ref({});
 watchEffect(() => {
   const isSmall = isSmallScreen.value;
   searchAreaStyle.value = {
-    left: infoWindowShow.value ? (isSmall ? "": "-20%") : "",
-    top: isSmall ? "2%": "2.5%"
+    left: infoWindowShow.value ? (isSmall ? "" : "-20%") : "",
+    top: isSmall ? "2%" : "2.5%",
+    transition: "left 0.4s",
   };
   mapChooseStyle.value = {
     display: "flex",
@@ -101,6 +101,7 @@ const zoomIn = () => map.setZoom(map.getZoom() + 1);
 const zoomOut = () => map.setZoom(map.getZoom() - 1);
 
 const search = () => {
+  if (isLoginFail()) return;
   geocode({
     address: searchTerm.value.includes(",")
       ? searchTerm.value.match(/^[^,]+/)?.[0].toLowerCase()
@@ -109,6 +110,7 @@ const search = () => {
 };
 
 const clear = () => {
+  if (isLoginFail()) return;
   mapInfoWindow.close();
   store.commit("setInfoWindowShow", false);
   marker.setMap(null);
@@ -116,6 +118,7 @@ const clear = () => {
 };
 
 const getIdByName = (name) => {
+  if (!dataList) return;
   const foundItem = dataList.find((item) => item.name === name);
   return foundItem ? foundItem.id : null;
 };
@@ -149,9 +152,14 @@ const geocode = (request) => {
 
 // set marker
 const setMarkers = async () => {
+  // check login status
+  const loginStatus = document.cookie;
+  console.log(loginStatus);
+
   // get data
   await get("/api/poi", (message) => {
     dataList = message;
+    store.commit("setPoiList", dataList);
   });
 
   const colorDict = {
@@ -169,6 +177,8 @@ const setMarkers = async () => {
     4: "Embrace the energy and excitement of this lively destination, but be prepared for crowds.",
     5: "Explore the iconic landmarks and must-see attractions of this bustling metropolis, but be ready for large crowds and queues.",
   };
+
+  if (!dataList) return;
 
   dataList.forEach((data) => {
     const busyLevel = data.busy;
@@ -215,6 +225,15 @@ const setMarkers = async () => {
   });
 };
 
+// login auth fail
+const isLoginFail = () => {
+  if (!computed(() => store.state.auth).value) {
+    ElMessage.warning("login to use this function");
+    return true;
+  }
+  return false;
+};
+
 // set heatMap
 const setHeatMap = async () => {
   await get("/api/poi", (message) => {
@@ -222,6 +241,8 @@ const setHeatMap = async () => {
   });
 
   const tempData = [];
+
+  if (!dataList) return;
 
   dataList.forEach((data) => {
     tempData.push({
@@ -255,7 +276,9 @@ const showMarkers = () => {
 const disappearHeatmap = () => heatMapObj.setMap(null);
 
 // show heatmap
-const showHeatmap = () => heatMapObj.setMap(map);
+const showHeatmap = () => {
+  heatMapObj.setMap(map);
+};
 
 // show poi location info
 const showLocInfo = (id) => {
@@ -266,18 +289,21 @@ const showLocInfo = (id) => {
 
 // map type choose
 const mapTypePlain = () => {
+  if (isLoginFail()) return;
   disappearHeatmap();
   disappearMarkers();
   isPlain = true;
 };
 
 const mapTypeMarker = () => {
+  if (isLoginFail()) return;
   disappearHeatmap();
   showMarkers();
   isPlain = false;
 };
 
 const mapTypeHeat = () => {
+  if (isLoginFail()) return;
   showHeatmap();
   disappearMarkers();
   isPlain = false;
@@ -307,6 +333,15 @@ const outsideClickFold = (event) => {
     }
   }
 };
+
+watchEffect(() => {
+  // watch the login auth of user
+  const userAuth = computed(() => store.state.auth);
+  if (userAuth.value) {
+    setMarkers();
+    setHeatMap();
+  }
+});
 
 // life circle functions
 onMounted(() => {
@@ -342,43 +377,40 @@ onMounted(() => {
   });
 
   geocoder = new google.maps.Geocoder();
-  autocomplete = new google.maps.places.Autocomplete(
-    inputRef.value.$el.querySelector("input"),
-    autoOptions
-  );
   mapInfoWindow = new google.maps.InfoWindow();
+  if (!isLoginFail) {
+    // autocomplete
+    autocomplete = new google.maps.places.Autocomplete(
+      inputRef.value.$el.querySelector("input"),
+      autoOptions
+    );
+    autocomplete.bindTo("bounds", map);
+    autocomplete.addListener("place_changed", () => {
+      marker.setVisible(false);
 
-  // autocomplete
-  autocomplete.bindTo("bounds", map);
-  autocomplete.addListener("place_changed", () => {
-    marker.setVisible(false);
+      const place = autocomplete.getPlace();
 
-    const place = autocomplete.getPlace();
+      if (!place.geometry || !place.geometry.location) {
+        search();
+        return;
+      }
 
-    if (!place.geometry || !place.geometry.location) {
-      search();
-      return;
-    }
+      // If the place has a geometry, then present it on a map.
+      if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+      } else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(17);
+      }
+      marker.setPosition(place.geometry.location);
+      marker.setVisible(true);
 
-    // If the place has a geometry, then present it on a map.
-    if (place.geometry.viewport) {
-      map.fitBounds(place.geometry.viewport);
-    } else {
-      map.setCenter(place.geometry.location);
-      map.setZoom(17);
-    }
-    marker.setPosition(place.geometry.location);
-    marker.setVisible(true);
-
-    searchTerm.value = place.name.toLowerCase();
-    locaitonID = getIdByName(searchTerm.value);
-    if (locaitonID) showLocInfo(locaitonID);
-    else marker.setMap(map);
-  });
-
-  // set marker list
-  setMarkers();
-  setHeatMap();
+      searchTerm.value = place.name.toLowerCase();
+      locaitonID = getIdByName(searchTerm.value);
+      if (locaitonID) showLocInfo(locaitonID);
+      else marker.setMap(map);
+    });
+  }
 });
 
 onUnmounted(() => {
@@ -395,6 +427,7 @@ onUnmounted(() => {
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
       <!-- search area -->
+
       <div class="search-area" :style="searchAreaStyle">
         <el-input
           :style="inputStyle"
@@ -421,6 +454,7 @@ onUnmounted(() => {
           >Clear</el-button
         >
       </div>
+
       <!-- switch map type -->
       <div :style="mapChooseStyle">
         <el-button
@@ -503,7 +537,7 @@ onUnmounted(() => {
     <transition name="slide-in-left">
       <div v-if="infoWindowShow" class="info-style">
         <div class="infoWindow" :style="infoStyle">
-          <infoPage :isSmall="isSmallScreen"></infoPage>
+          <InfoPage :isSmall="isSmallScreen"></InfoPage>
         </div>
       </div>
     </transition>
@@ -560,6 +594,8 @@ onUnmounted(() => {
       justify-content: center;
       width: 100vw;
       flex-wrap: wrap;
+      left: 0;
+      transition: left 0.3s ease;
       .search-input {
         border-radius: 4px;
         box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);

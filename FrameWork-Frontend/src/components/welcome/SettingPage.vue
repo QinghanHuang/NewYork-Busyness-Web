@@ -100,7 +100,11 @@ const form = reactive({
   avatar: "0",
 });
 
-const images = ref(Object.entries(avatarDict).slice(1).map(([id, url]) => ({ id: Number(id), url })));
+const images = ref(
+  Object.entries(avatarDict)
+    .slice(1)
+    .map(([id, url]) => ({ id: Number(id), url }))
+);
 const selectedImageId = ref(null);
 const chooseAvatarShow = ref(false);
 
@@ -115,6 +119,8 @@ onMounted(() => {
     form.phoneNumber = message.phoneNumber;
     form.avatar = message.avatar;
     userID = message.id;
+
+    store.commit("setAuth", true);
   });
 });
 
@@ -147,8 +153,6 @@ const onSubmit = () => {
     },
     (message) => console.log(message)
   );
-
-
 };
 
 const back = () => router.push("/func");

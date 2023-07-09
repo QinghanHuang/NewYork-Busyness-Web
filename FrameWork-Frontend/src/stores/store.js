@@ -20,11 +20,13 @@ const store = createStore({
   state() {
     return {
       sideBarShow: false,
+      auth:false,
       userName: "",
       infoWindowShow: false,
       userInfo: userObj,
       poiInfo: poiObj,
-      locationID:""
+      locationID:"",
+      poiList:[]
     };
   },
   mutations: {
@@ -45,6 +47,12 @@ const store = createStore({
     },
     setLocationID(state, value){
       state.locationID = value
+    },
+    setAuth(state, value){
+      state.auth = value
+    },
+    setPoiList(state, obj){
+      state.poiList = obj
     }
   },
   actions: {
