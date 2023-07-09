@@ -142,6 +142,7 @@ const isLoginFail = () => {
 const logout = () => {
   get("/api/auth/logout", (message) => {
     ElMessage.success(message);
+    store.commit('setAuth', false)
     router.push("/");
   });
 };
