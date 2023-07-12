@@ -133,6 +133,7 @@ const geocode = (request) => {
     .geocode(request)
     .then((result) => {
       const { results } = result;
+      console.log(results)
       map.setCenter(results[0].geometry.location);
       marker.setPosition(results[0].geometry.location);
       marker.setMap(map);
@@ -370,16 +371,23 @@ onMounted(() => {
     strictBounds: false,
     types: ["establishment"],
   };
-  // map marker geocoder autocomplete
+
+  // map
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  // marker
   marker = new google.maps.Marker({
     map,
   });
 
+  // geocoder
   geocoder = new google.maps.Geocoder();
+
+  // mapInfoWindow
   mapInfoWindow = new google.maps.InfoWindow();
-  if (!isLoginFail) {
-    // autocomplete
+
+  // autocomplete
+  // if (!isLoginFail) {
     autocomplete = new google.maps.places.Autocomplete(
       inputRef.value.$el.querySelector("input"),
       autoOptions
@@ -410,7 +418,7 @@ onMounted(() => {
       if (locaitonID) showLocInfo(locaitonID);
       else marker.setMap(map);
     });
-  }
+  // }
 });
 
 onUnmounted(() => {
