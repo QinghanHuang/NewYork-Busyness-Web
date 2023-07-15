@@ -19,8 +19,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Weather  implements Serializable {
-    private Long timeStamp;
-    private String timeString;
+    private String date;
+    private String dayOfWeek;
     private double temp;
     private int humidity;
     private double windSpeed;

@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,8 +33,10 @@ public class WeatherTest {
     RedisTemplate<String,List<Weather>> redisTemplate;
     @Test
     public void test() throws JsonProcessingException {
-//        List<Weather> forecastWeathers = weatherService.getForecastWeathers();
-//        System.out.println(forecastWeathers);
-        redisTemplate.opsForValue().get("forecast-weather");
+        LocalDate today = LocalDate.now(ZoneId.of("America/New_York"));
+        String s=today.toString();
+        System.out.println(s);
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        System.out.println(dayOfWeek);
     }
 }
