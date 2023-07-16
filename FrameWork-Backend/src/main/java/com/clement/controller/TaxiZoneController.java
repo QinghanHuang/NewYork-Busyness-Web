@@ -17,7 +17,7 @@ public class TaxiZoneController {
     private PoiService poiService;
     @GetMapping
     public RestBean<List<TaxiZone>> getAllTaxiZone() {
-        return poiService.getAllTaxiZone();
+        return poiService.getTaxiZoneLocation();
     }
 
 }

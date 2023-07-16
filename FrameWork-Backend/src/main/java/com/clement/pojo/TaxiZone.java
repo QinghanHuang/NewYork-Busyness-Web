@@ -7,7 +7,6 @@ public class TaxiZone {
     private int zid;
     private Location location;
     private double radius;
-    private int busy;
 
     @Data
     public static class Location {

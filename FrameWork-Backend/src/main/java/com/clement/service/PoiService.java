@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface PoiService {
     RestBean<PoiInfo> getPoiInfoById(String id);
-    RestBean<List<Poi>> getAllPoi();
-    RestBean<List<TaxiZone>> getAllTaxiZone();
+    RestBean<List<Poi>> getPoiLocation();
+    RestBean<List<TaxiZone>> getTaxiZoneLocation();
 }

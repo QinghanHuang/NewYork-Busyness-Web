@@ -11,12 +11,12 @@ import java.util.List;
 
 @Mapper
 public interface PoiMapper {
-    @Select("select * from poi_detail where id = #{id}")
+    @Select("select id, name, detailedLocation, open, close, url1, url2, url3, introduction from poi_detail where id = #{id}")
     PoiInfo getPoiInfoById (@Param("id") String id);
 
-    @Select("select * from poi")
+    @Select("select id, name, lng, lat from poi")
     List<Poi> getAllPoi();
 
-    @Select("select zid, circle_lng, circle_lat, radius, busy from taxi_zone")
+    @Select("select zid, circle_lng, circle_lat, radius from taxi_zone")
     List<TaxiZone> getAllTaxiZone();
 }

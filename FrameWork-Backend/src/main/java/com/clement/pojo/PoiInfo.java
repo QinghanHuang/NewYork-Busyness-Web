@@ -11,7 +11,6 @@ public class PoiInfo {
     private String name;
     private String detailedLocation;
     private OpenTime openTime;
-    private int busy;
     private List<String> img = new ArrayList<>();
     private String introduction;
 

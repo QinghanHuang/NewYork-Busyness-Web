@@ -21,11 +21,11 @@ public class PoiServiceImpl implements PoiService {
     }
 
     @Override
-    public RestBean<List<Poi>> getAllPoi() {
+    public RestBean<List<Poi>> getPoiLocation() {
         return RestBean.succcess(mapper.getAllPoi());
     }
     @Override
-    public RestBean<List<TaxiZone>> getAllTaxiZone() {
+    public RestBean<List<TaxiZone>> getTaxiZoneLocation() {
         return RestBean.succcess(mapper.getAllTaxiZone());
     }
 

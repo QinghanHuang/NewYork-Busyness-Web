@@ -17,9 +17,9 @@ public class PoiController {
     @Resource(name = "poiServiceImpl")
     private PoiService poiService;
 
-    @GetMapping
+    @GetMapping("/all")
     public RestBean<List<Poi>> getPoi(){
-        return poiService.getAllPoi();
+        return poiService.getPoiLocation();
     }
 
     @GetMapping("/{id}")
