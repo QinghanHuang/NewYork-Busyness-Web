@@ -3,7 +3,6 @@ package com.clement.service.impl;
 import com.clement.dao.PoiMapper;
 import com.clement.pojo.Poi;
 import com.clement.pojo.PoiInfo;
-import com.clement.pojo.RestBean;
 import com.clement.pojo.TaxiZone;
 import com.clement.service.PoiService;
 import jakarta.annotation.Resource;
@@ -16,17 +15,17 @@ public class PoiServiceImpl implements PoiService {
     PoiMapper mapper;
 
     @Override
-    public RestBean<PoiInfo> getPoiInfoById(String id) {
-        return RestBean.succcess(mapper.getPoiInfoById(id));
+    public PoiInfo getPoiInfoById(String id) {
+            return mapper.getPoiInfoById(id);
     }
 
     @Override
-    public RestBean<List<Poi>> getPoiLocation() {
-        return RestBean.succcess(mapper.getAllPoi());
+    public List<Poi> getPoiLocation() {
+            return mapper.getAllPoi();
     }
     @Override
-    public RestBean<List<TaxiZone>> getTaxiZoneLocation() {
-        return RestBean.succcess(mapper.getAllTaxiZone());
+    public List<TaxiZone> getTaxiZoneLocation() {
+        return mapper.getAllTaxiZone();
     }
 
 }
