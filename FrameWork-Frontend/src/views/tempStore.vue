@@ -1,12 +1,21 @@
 <script setup>
-import { CloseBold, Expand, Minus, Plus, DArrowRight } from "@element-plus/icons-vue";
+import {
+  CloseBold,
+  Search,
+  Expand,
+  Minus,
+  Plus,
+  DArrowRight,
+  Close,
+} from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watchEffect, Transition, computed } from "vue";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { get } from "@/net/axios";
 import { throttle, debounce } from "lodash";
 import InfoPage from "../components/welcome/LocInfoPage.vue";
-
+import WeatherPage from "../components/welcome/WeatherPage.vue";
+import { weatherIconDict } from "../assets/weather/weatherIconDict.js";
 
 // define
 const store = useStore();
@@ -20,7 +29,13 @@ const overlayRef = ref(null);
 const showOverlay = ref(false);
 const searchTerm = ref("");
 const markerList = [];
-let data;
+const weatherSrc = ref("");
+const currTemp = ref(null);
+const mapStyleSwitch = ref("HEATMAP");
+const forecastTime = ref(5)
+
+let weatherCurData;
+let weatherForDate;
 let geocoder;
 let map;
 let marker;
@@ -42,20 +57,29 @@ const zoomStyle = ref({});
 const typeChooseStyle = ref({});
 const mapChooseStyle = ref({});
 const searchAreaStyle = ref({});
+const weatherWindowTrigger = ref(null);
+const weatherWindowPlacement = ref(null);
 
 watchEffect(() => {
   const isSmall = isSmallScreen.value;
+  weatherWindowTrigger.value = isSmall ? "click" : "hover";
+  weatherWindowPlacement.value = isSmall ? "right" : "right";
+
   searchAreaStyle.value = {
     left: infoWindowShow.value ? (isSmall ? "" : "-20%") : "",
     top: isSmall ? "2%" : "2.5%",
     transition: "left 0.4s",
   };
   mapChooseStyle.value = {
+    backdropFilter: "blur(5px)",
+    borderRadius: "10px",
+    boxShadow: "0 0 5px rgba(0, 0, 0, 1)",
+    transition: "bottom 0.3s ease",
+    marginBottom: "10px",
     display: "flex",
     flexWrap: "wrap",
-    width: isSmall ? "10vw" : "",
-    alignItems: isSmall ? "left" : "center",
-    justifyContent: isSmall ? "left" : "center",
+    alignItems: "center",
+    justifyContent: "center",
     position: "absolute",
     bottom: isSmall ? (infoWindowShow.value ? "40vh" : "5px") : "20px",
     left: isSmall ? "5px" : "20px",
@@ -63,8 +87,8 @@ watchEffect(() => {
   zoomStyle.value = {
     flexDirection: isSmall ? "column" : "row",
     position: "absolute",
-    bottom: isSmall ? "43%" : "12%",
-    left: isSmall ? "85%" : "1%",
+    bottom: isSmall ? "50%" : "35px",
+    left: isSmall ? "85vw" : "400px",
   };
   typeChooseStyle.value = {
     backgroundColor: "white",
@@ -82,7 +106,7 @@ watchEffect(() => {
   inputStyle.value = {
     position: "relative",
     left: isSmall ? "8%" : "",
-    width: isSmall ? "75vw" : "300px",
+    width: isSmall ? "75vw" : infoWindowShow.value ? "300px" : "400px",
   };
   buttonStyle.value = {
     position: "relative",
@@ -98,26 +122,53 @@ watchEffect(() => {
 });
 
 // methods
+// weather relative
+const setWeather = () => {
+  // weather api
+  get("/api/weather/current", (res) => {
+    weatherCurData = res;
+    weatherSrc.value = `https://openweathermap.org/img/wn/${
+      weatherIconDict[weatherCurData.weatherId]
+    }@2x.png`;
+    currTemp.value = Math.round(weatherCurData.temp);
+  });
+};
+
 // map relative
+// move Map Center
+function moveMapCenter(offsetX, offsetY) {
+  const center = map.getCenter();
+  const pixelOffset = new google.maps.Point(offsetX, offsetY);
+  const newCenter = map.getProjection().fromLatLngToPoint(center);
+  newCenter.x += pixelOffset.x;
+  newCenter.y += pixelOffset.y;
+  const newLatLng = map.getProjection().fromPointToLatLng(newCenter);
+  map.panTo(newLatLng);
+  console.log(map.getCenter());
+}
+
 const zoomIn = () => map.setZoom(map.getZoom() + 1);
 const zoomOut = () => map.setZoom(map.getZoom() - 1);
 
 const search = () => {
+  if (isLoginFail()) return;
+
+  clear();
+
   geocode({
     address: searchTerm.value.includes(",")
-      ? searchTerm.value.match(/^[^,]+/)?.[0].toLowerCase()
-      : searchTerm.value.toLowerCase(),
+      ? searchTerm.value.match(/^[^,]+/)?.[0]
+      : searchTerm.value,
   });
 };
 
 const clear = () => {
   mapInfoWindow.close();
-  store.commit("setInfoWindowShow", false);
   marker.setMap(null);
-  searchTerm.value = "";
 };
 
 const getIdByName = (name) => {
+  if (!dataList) return;
   const foundItem = dataList.find((item) => item.name === name);
   return foundItem ? foundItem.id : null;
 };
@@ -125,7 +176,7 @@ const getIdByName = (name) => {
 const geocode = (request) => {
   if (!request.address) return;
 
-  mapInfoWindow.close();
+  clear();
   store.commit("setInfoWindowShow", false);
 
   geocoder
@@ -136,8 +187,8 @@ const geocode = (request) => {
       marker.setPosition(results[0].geometry.location);
       marker.setMap(map);
       searchTerm.value = results[0].formatted_address.includes(",")
-        ? results[0].formatted_address.match(/^[^,]+/)?.[0].toLowerCase()
-        : results[0].formatted_address.toLowerCase();
+        ? results[0].formatted_address.match(/^[^,]+/)?.[0]
+        : results[0].formatted_address;
 
       locaitonID = getIdByName(searchTerm.value);
       if (locaitonID) showLocInfo(locaitonID);
@@ -151,9 +202,14 @@ const geocode = (request) => {
 
 // set marker
 const setMarkers = async () => {
+  // check login status
+  const loginStatus = document.cookie;
+  console.log("loginStatus:", loginStatus);
+
   // get data
   await get("/api/poi", (message) => {
     dataList = message;
+    store.commit("setPoiList", dataList);
   });
 
   const colorDict = {
@@ -171,6 +227,8 @@ const setMarkers = async () => {
     4: "Embrace the energy and excitement of this lively destination, but be prepared for crowds.",
     5: "Explore the iconic landmarks and must-see attractions of this bustling metropolis, but be ready for large crowds and queues.",
   };
+
+  if (!dataList) return;
 
   dataList.forEach((data) => {
     const busyLevel = data.busy;
@@ -209,12 +267,23 @@ const setMarkers = async () => {
     customMarker.addListener("click", () => {
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
+
       map.panTo(data.location);
+
       showLocInfo(data.id);
     });
 
     markerList.push(customMarker);
   });
+};
+
+// login auth fail
+const isLoginFail = () => {
+  if (!computed(() => store.state.auth).value) {
+    ElMessage.warning("login to use this function");
+    return true;
+  }
+  return false;
 };
 
 // set heatMap
@@ -225,6 +294,8 @@ const setHeatMap = async () => {
 
   const tempData = [];
 
+  if (!dataList) return;
+
   dataList.forEach((data) => {
     tempData.push({
       location: new google.maps.LatLng(data.location.lat, data.location.lng),
@@ -234,7 +305,7 @@ const setHeatMap = async () => {
 
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
-    radius: 15,
+    radius: 20,
   });
 };
 
@@ -257,33 +328,34 @@ const showMarkers = () => {
 const disappearHeatmap = () => heatMapObj.setMap(null);
 
 // show heatmap
-const showHeatmap = () => heatMapObj.setMap(map);
+const showHeatmap = () => {
+  heatMapObj.setMap(map);
+};
+
+// map style change
+const mapStyleChange = () => {
+  if (mapStyleSwitch.value === "MARKERS") {
+    clear();
+    showHeatmap();
+    disappearMarkers();
+  } else {
+    showMarkers();
+    disappearHeatmap;
+  }
+};
 
 // show poi location info
 const showLocInfo = (id) => {
+  console.log("work");
   store.commit("setLocationID", id);
   store.commit("setInfoWindowShow", true);
-  if (!isPlain) marker.setMap(null);
+  if (!isSmallScreen.value) moveMapCenter(0.01, 0);
+  else moveMapCenter(0, 0.005);
+  marker.setMap(null);
 };
 
-// map type choose
-const mapTypePlain = () => {
-  disappearHeatmap();
-  disappearMarkers();
-  isPlain = true;
-};
-
-const mapTypeMarker = () => {
-  disappearHeatmap();
-  showMarkers();
-  isPlain = false;
-};
-
-const mapTypeHeat = () => {
-  showHeatmap();
-  disappearMarkers();
-  isPlain = false;
-};
+// close poi location info
+const closeInfo = () => store.commit("setInfoWindowShow", false);
 
 // window size relative
 const handleWindowResize = throttle(() => (isSmallScreen.value = window.innerWidth < 600), 200);
@@ -310,12 +382,18 @@ const outsideClickFold = (event) => {
   }
 };
 
+watchEffect(() => {
+  // watch the login auth of user
+  const userAuth = computed(() => store.state.auth);
+  if (userAuth.value) {
+    setMarkers();
+    setHeatMap();
+    setWeather();
+  }
+});
+
 // life circle functions
 onMounted(() => {
-  get("/api/weather/forecast", (res) => {
-    console.log(res);
-  });
-
   // adjust side bar size
   handleWindowResize();
   window.addEventListener("resize", handleWindowResize);
@@ -341,20 +419,27 @@ onMounted(() => {
     strictBounds: false,
     types: ["establishment"],
   };
-  // map marker geocoder autocomplete
+
+  // map
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  // marker
   marker = new google.maps.Marker({
     map,
   });
 
+  // geocoder
   geocoder = new google.maps.Geocoder();
+
+  // mapInfoWindow
+  mapInfoWindow = new google.maps.InfoWindow();
+
+  // autocomplete
+
   autocomplete = new google.maps.places.Autocomplete(
     inputRef.value.$el.querySelector("input"),
     autoOptions
   );
-  mapInfoWindow = new google.maps.InfoWindow();
-
-  // autocomplete
   autocomplete.bindTo("bounds", map);
   autocomplete.addListener("place_changed", () => {
     marker.setVisible(false);
@@ -366,6 +451,7 @@ onMounted(() => {
       return;
     }
 
+    clear();
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
@@ -375,16 +461,11 @@ onMounted(() => {
     }
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
-
-    searchTerm.value = place.name.toLowerCase();
+    marker.setMap(map);
+    searchTerm.value = place.name;
     locaitonID = getIdByName(searchTerm.value);
     if (locaitonID) showLocInfo(locaitonID);
-    else marker.setMap(map);
   });
-
-  // set marker list
-  setMarkers();
-  setHeatMap();
 });
 
 onUnmounted(() => {
@@ -401,72 +482,48 @@ onUnmounted(() => {
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
       <!-- search area -->
-
-        <div class="search-area" :style="searchAreaStyle">
-          <el-input
-            :style="inputStyle"
-            v-model="searchTerm"
-            ref="inputRef"
-            placeholder="Search location"
-            class="search-input"
-            size="large"
-          ></el-input>
-          <el-button
-            :style="buttonStyle"
-            @click="search"
-            type="primary"
-            size="large"
-            class="search-button"
-            >Search</el-button
-          >
-          <el-button
-            :style="buttonStyle"
-            @click="clear"
-            type="success"
-            size="large"
-            class="clear-button"
-            >Clear</el-button
-          >
-        </div>
+      <div class="search-area" :style="searchAreaStyle">
+        <el-input
+          :style="inputStyle"
+          v-model="searchTerm"
+          ref="inputRef"
+          placeholder="Search location"
+          class="search-input"
+          size="large"
+        >
+          <template #append>
+            <el-button style="width: 70px" :icon="Search" @click="search" /></template
+        ></el-input>
+      </div>
 
       <!-- switch map type -->
       <div :style="mapChooseStyle">
-        <el-button
-          plain
-          disabled
-          type="info"
-          size="small"
-          style="
-            color: black;
-            background-color: white;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            cursor: default;
-            margin-right: 20px;
-          "
-          >MAP STYLE</el-button
-        >
-        <el-button
-          :style="typeChooseStyle"
-          @click="mapTypePlain"
-          type="info"
-          :size="isSmallScreen ? 'default' : 'large'"
-          >Plain</el-button
-        >
-        <el-button
-          :style="typeChooseStyle"
-          @click="mapTypeMarker"
-          type="info"
-          :size="isSmallScreen ? 'default' : 'large'"
-          >Markers</el-button
-        >
-        <el-button
-          :style="typeChooseStyle"
-          @click="mapTypeHeat"
-          type="info"
-          :size="isSmallScreen ? 'default' : 'large'"
-          >Heatmap</el-button
-        >
+        <div style="color: black; cursor: default; margin-right: 20px; margin-left: 20px">
+          <b>CHOOSE MAP STYLE</b>
+        </div>
+        <el-tooltip :content="'change to map: ' + mapStyleSwitch" placement="top">
+          <el-switch
+            v-model="mapStyleSwitch"
+            inline-prompt
+            size="large"
+            style="
+              margin-right: 20px;
+              --el-switch-on-color: #003c55;
+              --el-switch-off-color: #d11e3b;
+            "
+            active-value="HEATMAP"
+            inactive-value="MARKERS"
+            active-text="&nbsp&nbsp&nbsp MAEKERS &nbsp&nbsp&nbsp  "
+            inactive-text=" &nbsp&nbsp&nbsp  HEATMAP  &nbsp&nbsp&nbsp "
+            @change="mapStyleChange"
+        /></el-tooltip>
       </div>
+
+      <!-- busy level forecast slider -->
+      <div>
+        <el-slider v-model="forecastTime" vertical height="200px" :max="24" />
+      </div>
+
       <!-- open side bar button -->
       <div ref="openSideBarRef">
         <el-button
@@ -477,11 +534,47 @@ onUnmounted(() => {
           size="large"
         ></el-button>
       </div>
+
       <!-- zoom in/out button -->
       <div class="zoom" :style="zoomStyle">
         <el-button v-show="false"></el-button>
         <el-button type="success" :icon="Plus" @click="zoomIn" circle></el-button>
         <el-button type="success" :icon="Minus" @click="zoomOut" circle></el-button>
+      </div>
+
+      <!-- close info button -->
+      <div style="position: absolute; bottom: 352px; left: 87vw">
+        <el-button
+          style="box-shadow: 0px 0px 5px rgba(0, 0, 0, 1)"
+          v-show="infoWindowShow && isSmallScreen"
+          :icon="Close"
+          @click="closeInfo"
+          circle
+          size="large"
+        ></el-button>
+      </div>
+
+      <!-- weather part -->
+      <div class="weather-part">
+        <el-popover
+          :show-arrow="false"
+          :trigger="weatherWindowTrigger"
+          :placement="weatherWindowPlacement"
+          :width="300"
+          popper-style="margin-top:100px;background-color: rgb(14, 116, 226);box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+        >
+          <template #reference>
+            <div class="current-weather" @click="open">
+              <img :src="weatherSrc" />
+              <p>
+                <b>{{ currTemp }}℃</b>
+              </p>
+            </div>
+          </template>
+          <template #default>
+            <WeatherPage></WeatherPage>
+          </template>
+        </el-popover>
       </div>
     </div>
     <!-- <div v-show="false" class="overlay-map"></div> -->
@@ -489,8 +582,8 @@ onUnmounted(() => {
     <!-- side bar position: absolute-->
     <div class="side-bar" ref="sideBarRef" @click="outsideClickFold">
       <transition name="slide-in-right">
+        <!-- <div v-if="false" :style="containerStyle"> -->
         <div v-if="sideBarShow" :style="containerStyle">
-          <!-- <div v-if="false" :style="containerStyle"> -->
           <!-- close button -->
           <el-button
             type="info"
@@ -518,11 +611,12 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .main-view {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 
   .welcome-title {
     position: absolute;
@@ -556,6 +650,7 @@ onUnmounted(() => {
     overflow-x: hidden;
     .open-side-bar-button {
       position: fixed;
+      width: 60px;
       top: 17px;
       left: 10px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
@@ -568,19 +663,10 @@ onUnmounted(() => {
       justify-content: center;
       width: 100vw;
       flex-wrap: wrap;
-      left:0;
+      left: 0;
       transition: left 0.3s ease;
       .search-input {
         border-radius: 4px;
-        box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
-      }
-
-      .search-button {
-        margin-left: 10px;
-        box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
-      }
-
-      .clear-button {
         box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
       }
     }
@@ -595,7 +681,51 @@ onUnmounted(() => {
       }
 
       & > *:last-child {
-        margin-top: 10px; /* 添加上边距 */
+        margin-top: 10px;
+      }
+    }
+
+    .weather-part {
+      width: auto;
+      height: auto;
+      // background-color: rgb(0, 0, 0);
+      position: fixed;
+      top: 0;
+      margin-top: 70px;
+      margin-left: 10px;
+
+      .current-weather {
+        width: 60px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+        background-color: rgb(14, 116, 226);
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          backdrop-filter: blur(5px);
+          z-index: -1;
+        }
+        img {
+          margin-top: 20px;
+          width: 100%;
+          filter: saturate(200%);
+        }
+
+        p {
+          color: rgb(237, 237, 237);
+          position: relative;
+          top: -20px;
+        }
       }
     }
   }
@@ -630,13 +760,13 @@ onUnmounted(() => {
 
   .infoWindow {
     position: absolute;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     right: 0%;
     top: 0%;
   }
 
   .info-style {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     position: absolute;
     width: 500px;
     height: 100vh;

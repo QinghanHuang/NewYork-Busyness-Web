@@ -17,7 +17,7 @@
     <el-divider />
     <div style="position: absolute; left: 10px; top: 100px; display: flex; flex-direction: row">
       <h2>Itinerary</h2>
-      <p style="color: gray; position: relative; top: 10px; margin-left: 20px">
+      <p style="color: gray; position: relative; top: 5px; margin-left: 20px">
         choose where you want to go and when
       </p>
     </div>

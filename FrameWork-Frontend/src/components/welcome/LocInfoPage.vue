@@ -35,14 +35,8 @@
       class="introduction"
       style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 18px"
     >
-      <p>
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbspCentral Park, located in the heart of Manhattan, is a
-        sprawling urban oasis covering 843 acres. Designed by Frederick Law Olmsted and Calvert
-        Vaux, it offers a serene escape from the city's hustle and bustle. With its scenic
-        landscapes, meandering pathways, and iconic landmarks like Bethesda Terrace and the
-        Jacqueline Kennedy Onassis Reservoir, Central Park is a beloved destination for leisurely
-        walks, picnics, and outdoor activities. Its rich history, cultural institutions, and natural
-        beauty make it a cherished symbol of New York City's vibrant spirit.
+      <p style="color: rgb(87, 87, 87);">
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{ locationDes }}
       </p>
     </div>
     <div v-if="!isSmall" @click="clear()" class="close">------click Here to close------</div>
@@ -58,6 +52,7 @@ import { useStore } from "vuex";
 let data;
 const locationName = ref("");
 const locationID = computed(() => store.state.locationID);
+const locationDes = ref("");
 const value = ref();
 const urls = ref([]);
 const store = useStore();
@@ -75,9 +70,8 @@ const imgStyle = ref({});
 const isOpen = (openTime, closeTime) => {
   const now = new Date();
   const options = { timeZone: "America/New_York", hour12: false };
-  const currentTime = now.toLocaleTimeString("en-US", options).slice(0, 5); // 获取当前时间的小时和分钟部分（格式：HH:mm）
+  const currentTime = now.toLocaleTimeString("en-US", options).slice(0, 5);
   const getTimeInMinutes = (timeStr) => {
-
     const [hour, minute] = timeStr.split(":").map(Number);
     return hour * 60 + minute;
   };
@@ -86,8 +80,8 @@ const isOpen = (openTime, closeTime) => {
   let closeTimeM = getTimeInMinutes(closeTime);
   let currentTimeM = getTimeInMinutes(currentTime);
 
-  if (closeTimeM < openTimeM) closeTimeM += 1440;
-
+  if (closeTimeM <= openTimeM) closeTimeM += 1440;
+  
   return currentTimeM >= openTimeM && currentTimeM <= closeTimeM;
 };
 
@@ -101,12 +95,16 @@ watchEffect(() => {
   };
 
   const ID = locationID.value;
+  console.log(ID);
   const url = `/api/poi/${ID}`;
   get(url, (res) => {
     data = res;
+    console.log("data:", data);
     locationName.value = data.name;
+    locationDes.value = data.introduction;
     value.value = data.busy;
     urls.value = data.img;
+    console.log(isOpen(data.openTime.open, data.openTime.close))
     openTimeText.value = isOpen(data.openTime.open, data.openTime.close)
       ? `OPEN NOW (${data.openTime.open} - ${data.openTime.close})`
       : `CLOSED (${data.openTime.open} - ${data.openTime.close})`;
