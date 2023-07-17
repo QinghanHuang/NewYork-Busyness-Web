@@ -93,18 +93,18 @@ onMounted(() => {
       align-items: center;
 
       .date-curr {
-        font-size: 30px;
+        font-size: 25px;
         position: relative;
-        top: 20px;
+        top: 15px;
         margin-bottom: 35px;
         border-radius: 5px;
         font-style: italic;
       }
 
       .des-curr {
-        font-size: 30px;
+        font-size: 20px;
         position: relative;
-        top: -50px;
+        top: -45px;
       }
     }
   }

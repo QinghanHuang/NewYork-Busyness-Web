@@ -46,7 +46,7 @@ let heatMapObj;
 let mapInfoWindow;
 let dataList;
 let locaitonID;
-let isPlain;
+let isHeatmap;
 
 // style edit
 const inputStyle = ref({});
@@ -195,6 +195,7 @@ const geocode = (request) => {
     .then((result) => {
       const { results } = result;
       map.setCenter(results[0].geometry.location);
+      map.setZoom(15);
       marker.setPosition(results[0].geometry.location);
       marker.setMap(map);
       searchTerm.value = results[0].formatted_address.includes(",")
@@ -242,7 +243,11 @@ const setMarkers = async () => {
   if (!dataList) return;
 
   dataList.forEach((data) => {
+    //test
+    data.busy = Math.floor(Math.random() * 5) + 1;
+
     const busyLevel = data.busy;
+
     const color = colorDict[busyLevel];
     const customMarker = new window.google.maps.Marker({
       position: data.location,
@@ -310,13 +315,24 @@ const setHeatMap = async () => {
   dataList.forEach((data) => {
     tempData.push({
       location: new google.maps.LatLng(data.location.lat, data.location.lng),
-      weight: data.busy,
+      // weight: data.busy,
+
+      //test
+      weight: Math.floor(Math.random() * 5) + 1,
     });
   });
 
+  console.log("heatmap data", tempData);
+
   heatMapObj = new google.maps.visualization.HeatmapLayer({
     data: tempData,
-    radius: 20,
+    radius: 30,
+  });
+
+  heatMapObj.setOptions({
+    // gradient: ["rgba(0, 255, 0, 0)", "rgba(255, 0, 0, 1)"],
+    maxIntensity: 5,
+    minIntensity: 1,
   });
 };
 
@@ -333,6 +349,8 @@ const showMarkers = () => {
     marker.setVisible(true);
     marker.setAnimation(google.maps.Animation.DROP);
   });
+  isHeatmap = false;
+  clear()
 };
 
 // disappear heatmap
@@ -341,6 +359,7 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 // show heatmap
 const showHeatmap = () => {
   heatMapObj.setMap(map);
+  isHeatmap = true;
 };
 
 // map style change
@@ -351,7 +370,7 @@ const mapStyleChange = () => {
     disappearMarkers();
   } else {
     showMarkers();
-    disappearHeatmap;
+    disappearHeatmap();
   }
 };
 
@@ -361,8 +380,8 @@ const showLocInfo = (id) => {
   store.commit("setLocationID", id);
   store.commit("setInfoWindowShow", true);
   if (!isSmallScreen.value) moveMapCenter(0.01, 0);
-  else moveMapCenter(0, 0.005);
-  marker.setMap(null);
+  else moveMapCenter(0, 0.003);
+  if (!isHeatmap) marker.setMap(null);
 };
 
 // close poi location info
@@ -466,9 +485,10 @@ onMounted(() => {
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
+      map.setZoom(15);
     } else {
       map.setCenter(place.geometry.location);
-      map.setZoom(17);
+      map.setZoom(15);
     }
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
@@ -554,7 +574,7 @@ onUnmounted(() => {
       </div>
 
       <!-- close info button -->
-      <div style="position: absolute; bottom: 352px; left: 87vw">
+      <div style="position: absolute; bottom: 350px; left: 87vw">
         <el-button
           style="box-shadow: 0px 0px 5px rgba(0, 0, 0, 1)"
           v-show="infoWindowShow && isSmallScreen"
