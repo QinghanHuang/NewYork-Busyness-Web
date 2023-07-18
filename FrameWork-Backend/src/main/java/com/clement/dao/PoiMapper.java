@@ -17,6 +17,8 @@ public interface PoiMapper {
     @Select("SELECT id, name, lng, lat FROM poi")
     List<Poi> getAllPois();
 
+//    @Select("SELECT id FROM poi")
+//    List<Integer> getPids();
 
     @Select("SELECT location_id, circle_lng, circle_lat, radius FROM taxi_zone")
     List<TaxiZone> getAllTaxiZones();

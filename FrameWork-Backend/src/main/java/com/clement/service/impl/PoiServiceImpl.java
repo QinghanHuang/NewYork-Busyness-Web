@@ -35,10 +35,7 @@ public class PoiServiceImpl implements PoiService {
         for (Poi poi: pois) {
             int pid = poi.getId();
             String zid = String.valueOf(mapper.getZidById(pid));
-            Map<String, List<Integer>> busyMap = getBusyMap();
-
-            List<Integer> busyList = busyMap.get(zid);
-
+            List<Integer> busyList = getBusyMap().get(zid);
             poi.setBusy(busyList);
         }
         return pois;
