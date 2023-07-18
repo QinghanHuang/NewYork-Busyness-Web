@@ -3,20 +3,33 @@ package com.clement.dao;
 import com.clement.pojo.Poi;
 import com.clement.pojo.PoiInfo;
 import com.clement.pojo.TaxiZone;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface PoiMapper {
-    @Select("select id, name, detailedLocation, open, close, url1, url2, url3, introduction from poi_detail where id = #{id}")
-    PoiInfo getPoiInfoById (@Param("id") String id);
+    @Select("SELECT id, name, detailedLocation, open, close, url1, url2, url3, introduction " +
+            "FROM poi_detail " +
+            "WHERE id = #{id}")
+    PoiInfo getPoiInfoById (@Param("id") int id);
 
-    @Select("select id, name, lng, lat from poi")
-    List<Poi> getAllPoi();
+    @Select("SELECT id, name, lng, lat FROM poi")
+    List<Poi> getAllPois();
 
-    @Select("select zid, circle_lng, circle_lat, radius from taxi_zone")
-    List<TaxiZone> getAllTaxiZone();
+
+    @Select("SELECT location_id, circle_lng, circle_lat, radius FROM taxi_zone")
+    List<TaxiZone> getAllTaxiZones();
+
+//    @Update("UPDATE taxi_zone SET busy=#{busy}, timestamp=#{timestamp} WHERE location_id=#{location_id}")
+//    int updateBusy(@Param("location_id") int location_id, @Param("timestamp") String timestamp, @Param("busy") int busy);
+
+    @Select("SELECT location_id FROM taxi_zone")
+    List<Integer> getLocationIds();
+
+    @Select("SELECT location_id FROM poi WHERE id=#{id}")
+    int getZidById(@Param("id") int id);
+
+//    @Select("SELECT timestamp FROM taxi_zone WHERE location_id=#{location_id}")
+//    String getTimeStamp(@Param("location_id") int location_id);
 }

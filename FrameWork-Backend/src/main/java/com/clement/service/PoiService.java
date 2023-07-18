@@ -6,9 +6,14 @@ import com.clement.pojo.TaxiZone;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PoiService {
-    PoiInfo getPoiInfoById(String id) throws JsonProcessingException;
-    List<Poi> getPoiLocation() throws JsonProcessingException;
-    List<TaxiZone> getTaxiZoneLocation() throws JsonProcessingException;
+    PoiInfo getPoiInfoById(int id) throws JsonProcessingException;
+    List<Poi> getAllPois() throws JsonProcessingException;
+    List<TaxiZone> getAllTaxiZones() throws JsonProcessingException;
+    void updateBusy();
+    Map<String, List<Integer>> getBusyMap();
+
+    int getZidById(int id);
 }
