@@ -1,14 +1,12 @@
 package com.clement.pojo;
 
 import lombok.Data;
-import java.util.List;
 
 @Data
 public class Poi{
     private int id;
     private String name;
     private Location location;
-    private List<Integer> busy;
 
     @Data
     public static class Location{

@@ -13,7 +13,6 @@ public class PoiInfo {
     private OpenTime openTime;
     private List<String> img = new ArrayList<>();
     private String introduction;
-    private int busy; // current busy
 
     @Data
     public static class OpenTime{

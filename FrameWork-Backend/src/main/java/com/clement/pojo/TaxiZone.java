@@ -2,14 +2,12 @@ package com.clement.pojo;
 
 import lombok.Data;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 public class TaxiZone implements Serializable {
     private int locationId;
     private Location location;
     private double radius;
-    private List<Integer> busy;
 
     @Data
     public static class Location {

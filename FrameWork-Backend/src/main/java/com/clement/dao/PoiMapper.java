@@ -29,6 +29,9 @@ public interface PoiMapper {
     @Select("SELECT location_id FROM taxi_zone")
     List<Integer> getLocationIds();
 
+    @Select("SELECT id FROM poi")
+    List<Integer> getIds();
+
     @Select("SELECT location_id FROM poi WHERE id=#{id}")
     int getZidById(@Param("id") int id);
 
