@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" version="4.4.1">
+    <Header copyright="Copyright (c) 2021 Software AG" description="Default description">
+        <Application name="Nyoka" version="5.4.0"/>
+        <Timestamp>2023-07-20 23:37:34.559294</Timestamp>
+    </Header>
+    <DataDictionary numberOfFields="3">
+        <DataField name="X1" optype="continuous" dataType="double"/>
+        <DataField name="X2" optype="continuous" dataType="double"/>
+        <DataField name="y" optype="continuous" dataType="double"/>
+    </DataDictionary>
+    <RegressionModel modelName="LinearRegression" functionName="regression">
+        <MiningSchema>
+            <MiningField name="X1" usageType="active" optype="continuous"/>
+            <MiningField name="X2" usageType="active" optype="continuous"/>
+            <MiningField name="y" usageType="target" optype="continuous"/>
+        </MiningSchema>
+        <Output>
+            <OutputField name="predicted_y" optype="continuous" dataType="double" feature="predictedValue"/>
+        </Output>
+        <RegressionTable intercept="0.0000000000000000">
+            <NumericPredictor name="X1" exponent="1" coefficient="0.5999999999999998"/>
+            <NumericPredictor name="X2" exponent="1" coefficient="1.2000000000000000"/>
+        </RegressionTable>
+    </RegressionModel>
+</PMML>
