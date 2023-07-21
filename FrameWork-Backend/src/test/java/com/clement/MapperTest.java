@@ -24,7 +24,6 @@ public class MapperTest {
         clement.setAvatar(2);
         clement.setBirthday(Date.valueOf("2001-08-18"));
         accountMapper.UpdateAccountDetailByUsernameOrEmail(clement);
-
     }
 }
 

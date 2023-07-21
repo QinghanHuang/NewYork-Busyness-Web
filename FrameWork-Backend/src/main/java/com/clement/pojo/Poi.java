@@ -1,18 +1,15 @@
 package com.clement.pojo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Poi {
+public class Poi{
     private int id;
     private String name;
     private Location location;
-    private int busy;
 
     @Data
-    public class Location{
+    public static class Location{
         private double lng;
         private double lat;
     }
