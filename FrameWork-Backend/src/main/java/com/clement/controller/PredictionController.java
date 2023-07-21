@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -17,11 +18,11 @@ public class PredictionController {
     private PredictionService predictionService;
 
     // For itinerary: get poi busy level by id and its busyness level
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/{time}")
     public RestBean<Integer> predictBusyById(@PathVariable int id,
-                                             @RequestParam("targetTime") @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm") LocalDateTime targetTime){
+                                             @PathVariable("time") @DateTimeFormat(pattern = "yyyy-MM-dd-HH") LocalDateTime time){
         try {
-            int hour = targetTime.getHour();
+            int hour = time.getHour();
             int busy = predictionService.getBusyById(id, hour);
             // TODO: typo RestBean.success
             return RestBean.succcess(busy);
@@ -31,8 +32,8 @@ public class PredictionController {
     }
 
     // Get busyness levels for taxi zones on a specified date
-    @GetMapping("/zone")
-    public RestBean<List<HashMap<Integer, Integer>>> predictZoneBusys(@RequestParam("targetTime") @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm") LocalDateTime targetTime){
+    @GetMapping("/zone/{date}")
+    public RestBean<List<HashMap<Integer, Integer>>> predictZoneBusys(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         try {
             List<HashMap<Integer, Integer>> result = predictionService.getZoneBusys();
             return RestBean.succcess(result);
@@ -42,8 +43,8 @@ public class PredictionController {
     }
 
     // Get busyness levels for pois on a specified date
-    @GetMapping("/poi")
-    public RestBean<List<HashMap<Integer, Integer>>> predictPoiBusys(@RequestParam("targetTime") @DateTimeFormat(pattern = "yyyy-MM-dd-HH-mm") LocalDateTime targetTime){
+    @GetMapping("/poi/{date}")
+    public RestBean<List<HashMap<Integer, Integer>>> predictPoiBusys(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         try {
             List<HashMap<Integer, Integer>> result = predictionService.getPoiBusys();
             return RestBean.succcess(result);
