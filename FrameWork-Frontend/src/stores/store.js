@@ -1,6 +1,6 @@
-import { createStore } from 'vuex';
+import { createStore } from "vuex";
 
-const userObj = {
+let userObj = {
   name: " ",
   birthday: "",
   introduction: "",
@@ -8,25 +8,35 @@ const userObj = {
   username: "",
   email: "",
   phoneNumber: "",
-  avatar:"0"
-}
+  avatar: "0",
+};
 
-const poiObj = [{
-  id: "00",
-  name: null
-}]
+let poiObj = [
+  {
+    id: "00",
+    name: null,
+  },
+];
+
+let zoneObj = [{}];
+let poiDataObj = [{}];
+let zoneDataObj = [{}];
 
 const store = createStore({
   state() {
     return {
       sideBarShow: false,
-      auth:false,
+      auth: false,
       userName: "",
       infoWindowShow: false,
       userInfo: userObj,
       poiInfo: poiObj,
-      locationID:"",
-      poiList:[]
+      zoneInfo: zoneObj,
+      locationID: "",
+      poiList: [],
+      poiData: poiDataObj,
+      zoneData: zoneDataObj,
+      busy: 1,
     };
   },
   mutations: {
@@ -39,27 +49,39 @@ const store = createStore({
     setInfoWindowShow(state, value) {
       state.infoWindowShow = value;
     },
-    setUserInfo(state, obj){
-      state.userInfo = obj
+    setUserInfo(state, obj) {
+      state.userInfo = obj;
     },
-    setPoiInfo(state,obj){
-      state.userInfo = obj
+    setPoiInfo(state, obj) {
+      state.poiInfo = obj;
     },
-    setLocationID(state, value){
-      state.locationID = value
+    setZoneInfo(state, obj) {
+      state.zoneInfo = obj;
     },
-    setAuth(state, value){
-      state.auth = value
+    setLocationID(state, value) {
+      state.locationID = value;
     },
-    setPoiList(state, obj){
-      state.poiList = obj
-    }
+    setAuth(state, value) {
+      state.auth = value;
+    },
+    setPoiList(state, obj) {
+      state.poiList = obj;
+    },
+    setPoiData(state, obj) {
+      state.poiData = obj;
+    },
+    setZoneData(state, obj) {
+      state.zoneData = obj;
+    },
+    setBusy(state, obj) {
+      state.busy = obj;
+    },
   },
   actions: {
     updateUserName({ commit }, value) {
-      commit('userName', value);
-    }
-  }
+      commit("userName", value);
+    },
+  },
 });
 
 export default store;

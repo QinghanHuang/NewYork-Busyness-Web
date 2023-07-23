@@ -39,12 +39,9 @@ const desCur = ref("");
 const columns = ref(null);
 const imgSrcFur = ref("");
 
-onMounted(() => {
-  get("/api/weather/forecast", (res) => {
-    console.log(res);
+onMounted(async () => {
+  await get("/api/weather/forecast", (res) => {
     weatherData.value = res;
-    console.log();
-    console.log(weatherIconDict[weatherData.value[0].weatherId]);
     imgSrcCur.value = `https://openweathermap.org/img/wn/${
       weatherIconDict[weatherData.value[0].weatherId]
     }@4x.png`;
@@ -53,7 +50,6 @@ onMounted(() => {
     desCur.value = weatherData.value[0].weatherMain;
     columns.value = weatherData.value.slice(1, 6);
     columns.value.forEach((day) => {
-      console.log(day);
       day.date = day.date.slice(5).replace(/-/g, "/");
       day.dayOfWeek = day.dayOfWeek.slice(0, 3);
       day.temp = Math.round(day.temp);

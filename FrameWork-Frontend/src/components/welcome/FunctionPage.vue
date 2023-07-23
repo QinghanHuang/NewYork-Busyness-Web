@@ -74,7 +74,7 @@
                   score-template="{value}"
                   disabled
                   :colors="['#409eff', '#FF9900', 'red']"
-                  style="width: 50px; position: relative; top: 3px; left:8px"
+                  style="width: 50px; position: relative; top: 3px; left: 8px"
                   size="small"
                 />
               </div>
@@ -94,7 +94,7 @@ import { useStore } from "vuex";
 import { get } from "@/net/axios";
 import { ref, computed, onMounted, watchEffect } from "vue";
 import router from "@/router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { avatarDict } from "../../assets/avatars/avatarDict";
 import {
   Minus,
@@ -104,7 +104,7 @@ import {
   CircleCloseFilled,
 } from "@element-plus/icons-vue";
 
-const store = useStore()
+const store = useStore();
 const username = ref("");
 const avatar = ref("");
 const introduction = ref("");
@@ -120,14 +120,16 @@ const columns = ref([
 ]);
 
 const icons = [SuccessFilled, WarningFilled, CircleCloseFilled];
-let locations
+let locations;
 
-get("/api/user/me", (res) => {
-  avatar.value = avatarDict[res.avatar];
-  introduction.value = res.introduction;
-  if (res.name) username.value = res.name;
-  else username.value = res.username;
-  store.commit('setAuth', true)
+onMounted(() => {
+  get("/api/user/me", (res) => {
+    avatar.value = avatarDict[res.avatar];
+    introduction.value = res.introduction;
+    if (res.name) username.value = res.name;
+    else username.value = res.username;
+    store.commit("setAuth", true);
+  });
 });
 
 // login auth fail
@@ -142,7 +144,7 @@ const isLoginFail = () => {
 const logout = () => {
   get("/api/auth/logout", (message) => {
     ElMessage.success(message);
-    store.commit('setAuth', false)
+    store.commit("setAuth", false);
     router.push("/");
   });
 };
@@ -152,8 +154,8 @@ const setting = () => {
 };
 
 const toggleSelection = (column) => {
-  if(isLoginFail()) return
-  locations = computed(()=> store.state.poiList).value.map((item) => item.name)
+  if (isLoginFail()) return;
+  locations = computed(() => store.state.poiList).value.map((item) => item.name);
   column.showSelection = !column.showSelection;
   if (column.showSelection) {
     columns.value.push({

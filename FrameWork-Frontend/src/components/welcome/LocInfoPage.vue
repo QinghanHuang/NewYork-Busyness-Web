@@ -35,9 +35,7 @@
       class="introduction"
       style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 18px"
     >
-      <p style="color: rgb(87, 87, 87);">
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{ locationDes }}
-      </p>
+      <p style="color: rgb(87, 87, 87)">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{ locationDes }}</p>
     </div>
     <div v-if="!isSmall" @click="clear()" class="close">------click Here to close------</div>
   </div>
@@ -67,6 +65,22 @@ const openTimeText = ref("");
 const widthStyle = ref({});
 const imgStyle = ref({});
 
+// get time
+const acquireTime = () => {
+  // Get the current date and time
+  const today = new Date();
+
+  // Extract the year, month, day, and hour
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based, so we add 1
+  const day = String(today.getDate()).padStart(2, "0");
+  const hours = String(today.getHours()).padStart(2, "0");
+
+  // Format the date and time as "YYYY-MM-DD-HH"
+  const formattedDateTime = `${year}-${month}-${day}-${hours}`;
+  return formattedDateTime;
+};
+
 const isOpen = (openTime, closeTime) => {
   const now = new Date();
   const options = { timeZone: "America/New_York", hour12: false };
@@ -81,8 +95,26 @@ const isOpen = (openTime, closeTime) => {
   let currentTimeM = getTimeInMinutes(currentTime);
 
   if (closeTimeM <= openTimeM) closeTimeM += 1440;
-  
+
   return currentTimeM >= openTimeM && currentTimeM <= closeTimeM;
+};
+
+const getBusyByTimeAndPid = (data, time, pid) => {
+  console.log(data, time, pid)
+  const dataByTime = {};
+  for (const key in data) {
+    const item = data[key];
+    if (!dataByTime[item.time]) {
+      dataByTime[item.time] = {};
+    }
+    dataByTime[item.time][item.pid] = item.busy;
+  }
+
+  if (dataByTime[time] && dataByTime[time][pid] !== undefined) {
+    return dataByTime[time][pid];
+  } else {
+    return null;
+  }
 };
 
 watchEffect(() => {
@@ -99,12 +131,12 @@ watchEffect(() => {
   const url = `/api/poi/${ID}`;
   get(url, (res) => {
     data = res;
-    console.log("data:", data);
     locationName.value = data.name;
     locationDes.value = data.introduction;
-    value.value = data.busy;
+    const poiData = computed(() => store.state.poiData).value;
+    value.value = getBusyByTimeAndPid(poiData, acquireTime(), ID);
     urls.value = data.img;
-    console.log(isOpen(data.openTime.open, data.openTime.close))
+    console.log(isOpen(data.openTime.open, data.openTime.close));
     openTimeText.value = isOpen(data.openTime.open, data.openTime.close)
       ? `OPEN NOW (${data.openTime.open} - ${data.openTime.close})`
       : `CLOSED (${data.openTime.open} - ${data.openTime.close})`;

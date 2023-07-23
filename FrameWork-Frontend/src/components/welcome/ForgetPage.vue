@@ -114,7 +114,8 @@ const doReset = () => {
 </script>
 
 <template>
-  <div>
+  <div style="text-align: center; margin: 0 20px; position: relative; top: -5vh">
+    <img src="../../assets/logo/ucdlogo.png" alt="ucd" style="width: 100px; padding-bottom: 20px;">
     <div style="margin: 0px 20px">
       <el-steps :active="active" finish-status="success" align-center>
         <el-step title="Verify Email " />

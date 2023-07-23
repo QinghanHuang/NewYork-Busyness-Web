@@ -114,7 +114,8 @@ const validateEmail = () => {
 </script>
 
 <template>
-  <div style="text-align: center; margin: 0 20px">
+  <div style="text-align: center; margin: 0 20px; position: relative; top: -5vh">
+    <img src="../../assets/logo/ucdlogo.png" alt="ucd" style="width: 100px; padding-bottom: 20px;">
     <div style="font-size: 25px; font-weight: bold">Sign Up</div>
     <div style="font-size: 14px; color: grey">
       Welcome,Please Input User Detail Below
