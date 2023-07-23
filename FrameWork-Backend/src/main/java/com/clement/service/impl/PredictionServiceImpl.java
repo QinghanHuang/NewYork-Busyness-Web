@@ -24,8 +24,8 @@ public class PredictionServiceImpl implements PredictionService {
     PoiMapper mapper;
 
     Random random = new Random();
-    List<ZoneBusy> zoneBusyList = new ArrayList<>();
-    List<PoiBusy> poiBusyList=new ArrayList<>();
+
+
 
     List<Integer> locationIds;
     List<Integer> pids;
@@ -44,6 +44,7 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     public List<ZoneBusy> getZoneBusys(LocalDate date) {
+        List<ZoneBusy> zoneBusyList = new ArrayList<>();
 
         for (int hour = 0; hour < 24; hour++) {
             for (int locationId : locationIds) {
@@ -56,6 +57,7 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     public List<PoiBusy> getPoiBusys(LocalDate date) {
+        List<PoiBusy> poiBusyList=new ArrayList<>();
 
         for (int hour = 0; hour < 24; hour++) {
             for (Integer pid : pids) {
