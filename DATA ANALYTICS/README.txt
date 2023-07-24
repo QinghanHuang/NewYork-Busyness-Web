@@ -1,5 +1,5 @@
 -This folder contains a number of sub-folders. Each sub-folder represents
-a training run and all the code need for data cleaning and training the 
+a training run and all the code needed for data cleaning and training the 
 machine learning model. 
 
 -NB Each folder also has its own unqiue README file in order to further contexualise the Data Analytics. 
