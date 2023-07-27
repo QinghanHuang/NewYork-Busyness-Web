@@ -3,6 +3,7 @@ package com.clement.service.impl;
 import com.clement.dao.PoiMapper;
 import com.clement.pojo.prediction.PoiBusy;
 import com.clement.pojo.prediction.ZoneBusy;
+import com.clement.service.DemoPmmlModelService;
 import com.clement.service.PredictionService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -18,10 +19,19 @@ import java.util.*;
  * @Desc
  * @Version 1.0
  */
+
+/**
+ * the parameter for model
+ * Double id,Double area from map
+ * Double month,Double dayOfMonth,Double dayOfWeek,Double hour from date
+ */
 @Service
 public class PredictionServiceImpl implements PredictionService {
     @Resource
     PoiMapper mapper;
+
+    @Resource
+    DemoPmmlModelService model;
 
     Random random = new Random();
 
@@ -29,17 +39,21 @@ public class PredictionServiceImpl implements PredictionService {
 
     List<Integer> locationIds;
     List<Integer> pids;
-    Map<Integer, Integer> map;
+    Map<Integer, Integer> getZid;
+    Map<Integer, Double> getArea;
 
 
     @PostConstruct
     public void init() {
         locationIds = mapper.getLocationIds();
         pids = mapper.getIds();
-        map = new HashMap<>();
+        getZid = new HashMap<>();
+        getArea=new HashMap<>();
         for (Integer pid : pids) {
             int zid = mapper.getZidById(pid);
-            map.put(pid, zid);
+            getZid.put(pid, zid);
+            double area=mapper.getAreaByPid(pid);
+            getArea.put(pid,area);
         }
     }
 
@@ -59,9 +73,17 @@ public class PredictionServiceImpl implements PredictionService {
     public List<PoiBusy> getPoiBusys(LocalDate date) {
         List<PoiBusy> poiBusyList=new ArrayList<>();
 
+        Double month=(double)date.getMonth().getValue();
+        Double dayOfMonth=(double)date.getDayOfMonth();
+        Double dayOfWeek = (double)date.getDayOfWeek().getValue()-1;
+
+
         for (int hour = 0; hour < 24; hour++) {
             for (Integer pid : pids) {
-                int busy = random.nextInt(5) + 1;
+                Double zid= (double)getZid.get(pid);
+                Double area= getArea.get(pid);
+
+                int busy =model.predict(zid,month,dayOfMonth,dayOfWeek,(double)hour,area);
                 LocalDateTime time = date.atTime(hour, 0);
                 poiBusyList.add(new PoiBusy(time, pid, busy));
             }
@@ -70,7 +92,14 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     public PoiBusy getPoiBusyById(int id, LocalDateTime time){
-        int busy = random.nextInt(5) + 1;
+        Double zid= (double)getZid.get(id);
+        Double area= getArea.get(id);
+        Double month=(double)time.getMonth().getValue();
+        Double dayOfMonth=(double)time.getDayOfMonth();
+        Double dayOfWeek = (double)time.getDayOfWeek().getValue()-1;
+        Double hour = (double)time.getHour();
+
+        int busy =model.predict(zid,month,dayOfMonth,dayOfWeek,hour,area);
         return new PoiBusy(time,id,busy);
     }
 }

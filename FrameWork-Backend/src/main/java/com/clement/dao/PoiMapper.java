@@ -34,6 +34,8 @@ public interface PoiMapper {
 
     @Select("SELECT location_id FROM poi WHERE id=#{id}")
     int getZidById(@Param("id") int id);
+    @Select("SELECT area FROM poi WHERE id=#{id}")
+    double getAreaByPid(@Param("id") int id);
 
 //    @Select("SELECT timestamp FROM taxi_zone WHERE location_id=#{location_id}")
 //    String getTimeStamp(@Param("location_id") int location_id);

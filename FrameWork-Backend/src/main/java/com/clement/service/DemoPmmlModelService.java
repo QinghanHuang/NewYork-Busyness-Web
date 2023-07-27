@@ -16,7 +16,7 @@ public class DemoPmmlModelService {
     public DemoPmmlModelService() {
         // Load PMML model from the resource folder
         try {
-            ClassPathResource pmmlResource = new ClassPathResource("test_model.pmml");
+            ClassPathResource pmmlResource = new ClassPathResource("model_727.pmml");
             PMML pmml = org.jpmml.model.PMMLUtil.unmarshal(pmmlResource.getInputStream());
             EvaluatorBuilder evaluatorBuilder = new ModelEvaluatorBuilder(pmml);
             evaluator = evaluatorBuilder.build();
@@ -25,17 +25,23 @@ public class DemoPmmlModelService {
         }
     }
 
-    public int predict(int input1, int input2) {
+    public int predict(Double id,Double month,Double dayOfMonth,Double dayOfWeek,Double hour,Double area) {
         // Convert the input data to the format expected by the Evaluator
-        Map<String, Integer> inputData = new HashMap<>();
-        inputData.put("X1", input1);
-        inputData.put("X2", input2);
+        Map<String, Double> inputData = new HashMap<>();
+        inputData.put("DOLocationID", id);
+        inputData.put("dropoff_hour", hour);
+        inputData.put("DOLocation_area", area);
+        inputData.put("dropoff_day_of_week", dayOfWeek);
+        inputData.put("dropoff_day_of_month", dayOfMonth);
+        inputData.put("dropoff_month", month);
 
         // Evaluate the model with the input data
         Map<String, ?> result = evaluator.evaluate(inputData);
+        System.out.println(result);
 
         // Get the predicted output value (assuming the output is a single integer value)
-        int prediction = ((Number) result.get("y")).intValue();
-        return prediction;
+        return (Integer) result.get("predicted_busyness");
+
     }
+
 }
