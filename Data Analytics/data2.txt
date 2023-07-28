@@ -1,0 +1,256 @@
+DOLocationID: 41
+DOLocation_area: 0.000143093037737
+DOLocation_perimeter: 0.052793109453
+
+DOLocationID: 48
+DOLocation_area: 9.4253842538e-05
+DOLocation_perimeter: 0.0437467441431
+
+DOLocationID: 68
+DOLocation_area: 0.000111073378655
+DOLocation_perimeter: 0.0493373795569
+
+DOLocationID: 75
+DOLocation_area: 0.00024056392715
+DOLocation_perimeter: 0.0876638997685
+
+DOLocationID: 107
+DOLocation_area: 7.4611219268e-05
+DOLocation_perimeter: 0.0380413645908
+
+DOLocationID: 114
+DOLocation_area: 4.7020770494e-05
+DOLocation_perimeter: 0.0317270347711
+
+DOLocationID: 141
+DOLocation_area: 7.6654557902e-05
+DOLocation_perimeter: 0.0415144638712
+
+DOLocationID: 158
+DOLocation_area: 0.000185568253002
+DOLocation_perimeter: 0.0548099905515
+
+DOLocationID: 162
+DOLocation_area: 4.7893696211e-05
+DOLocation_perimeter: 0.0352698146219
+
+DOLocationID: 238
+DOLocation_area: 0.000184763693765
+DOLocation_perimeter: 0.0601093114033
+
+DOLocationID: 246
+DOLocation_area: 0.000281298327076
+DOLocation_perimeter: 0.0694671937437
+
+DOLocationID: 262
+DOLocation_area: 0.000122330270966
+DOLocation_perimeter: 0.0490636231541
+
+DOLocationID: 43
+DOLocation_area: 0.000379662912054
+DOLocation_perimeter: 0.0997386183576
+
+DOLocationID: 170
+DOLocation_area: 7.4315067597e-05
+DOLocation_perimeter: 0.0457690091051
+
+DOLocationID: 24
+DOLocation_area: 6.0723573775e-05
+DOLocation_perimeter: 0.0469999619287
+
+DOLocationID: 90
+DOLocation_area: 5.531324763e-05
+DOLocation_perimeter: 0.0307591620819
+
+DOLocationID: 116
+DOLocation_area: 0.000260415337217
+DOLocation_perimeter: 0.0681164844265
+
+DOLocationID: 137
+DOLocation_area: 0.000116455098947
+DOLocation_perimeter: 0.0461076242707
+
+DOLocationID: 142
+DOLocation_area: 7.5653792074e-05
+DOLocation_perimeter: 0.0381758942321
+
+DOLocationID: 151
+DOLocation_area: 0.000128848901918
+DOLocation_perimeter: 0.0548899410999
+
+DOLocationID: 209
+DOLocation_area: 3.8870335121e-05
+DOLocation_perimeter: 0.0306953113473
+
+DOLocationID: 229
+DOLocation_area: 9.4705823093e-05
+DOLocation_perimeter: 0.0425252900116
+
+DOLocationID: 230
+DOLocation_area: 5.6091446327e-05
+DOLocation_perimeter: 0.0310283096779
+
+DOLocationID: 231
+DOLocation_area: 0.000166929752992
+DOLocation_perimeter: 0.0634201165587
+
+DOLocationID: 233
+DOLocation_area: 0.000116188094682
+DOLocation_perimeter: 0.048035918294
+
+DOLocationID: 237
+DOLocation_area: 9.5987320662e-05
+DOLocation_perimeter: 0.0422126003388
+
+DOLocationID: 4
+DOLocation_area: 0.000111871946192
+DOLocation_perimeter: 0.0435665270921
+
+DOLocationID: 13
+DOLocation_area: 0.000149358592917
+DOLocation_perimeter: 0.0502813228631
+
+DOLocationID: 74
+DOLocation_area: 0.000295038418204
+DOLocation_perimeter: 0.11029093625
+
+DOLocationID: 79
+DOLocation_area: 0.000107893068218
+DOLocation_perimeter: 0.0426249113144
+
+DOLocationID: 143
+DOLocation_area: 0.00015109426901
+DOLocation_perimeter: 0.0541798538849
+
+DOLocationID: 161
+DOLocation_area: 7.1913068299e-05
+DOLocation_perimeter: 0.0358039100611
+
+DOLocationID: 166
+DOLocation_area: 0.000255276270405
+DOLocation_perimeter: 0.0688237542871
+
+DOLocationID: 186
+DOLocation_area: 3.7072941695e-05
+DOLocation_perimeter: 0.0246963902234
+
+DOLocationID: 234
+DOLocation_area: 7.3105438289e-05
+DOLocation_perimeter: 0.0360721994984
+
+DOLocationID: 236
+DOLocation_area: 0.000102864345211
+DOLocation_perimeter: 0.0442519223099
+
+DOLocationID: 239
+DOLocation_area: 0.000204715440774
+DOLocation_perimeter: 0.0636261152958
+
+DOLocationID: 244
+DOLocation_area: 0.000359702747951
+DOLocation_perimeter: 0.0805686044599
+
+DOLocationID: 249
+DOLocation_area: 7.2215595773e-05
+DOLocation_perimeter: 0.03638434365
+
+DOLocationID: 261
+DOLocation_area: 3.4342323165e-05
+DOLocation_perimeter: 0.0271204563616
+
+DOLocationID: 42
+DOLocation_area: 0.000263896952605
+DOLocation_perimeter: 0.0927092274616
+
+DOLocationID: 127
+DOLocation_area: 0.000163195647796
+DOLocation_perimeter: 0.0600188855815
+
+DOLocationID: 152
+DOLocation_area: 0.000146637644064
+DOLocation_perimeter: 0.0579094768782
+
+DOLocationID: 125
+DOLocation_area: 7.6429320989e-05
+DOLocation_perimeter: 0.0497322121757
+
+DOLocationID: 164
+DOLocation_area: 5.5631823744e-05
+DOLocation_perimeter: 0.0357716119908
+
+DOLocationID: 144
+DOLocation_area: 4.7478967037e-05
+DOLocation_perimeter: 0.0276201668505
+
+DOLocationID: 163
+DOLocation_area: 4.085678042e-05
+DOLocation_perimeter: 0.0341768669752
+
+DOLocationID: 12
+DOLocation_area: 4.1511623673e-05
+DOLocation_perimeter: 0.0366613013579
+
+DOLocationID: 45
+DOLocation_area: 9.1359468856e-05
+DOLocation_perimeter: 0.0459068626235
+
+DOLocationID: 50
+DOLocation_area: 0.000173249283326
+DOLocation_perimeter: 0.0557479867536
+
+DOLocationID: 87
+DOLocation_area: 6.7205021069e-05
+DOLocation_perimeter: 0.0369015496117
+
+DOLocationID: 88
+DOLocation_area: 5.7299945541e-05
+DOLocation_perimeter: 0.0352046035327
+
+DOLocationID: 100
+DOLocation_area: 3.7470021029e-05
+DOLocation_perimeter: 0.0248131090342
+
+DOLocationID: 113
+DOLocation_area: 5.79634567e-05
+DOLocation_perimeter: 0.032745350566
+
+DOLocationID: 148
+DOLocation_area: 6.9748992133e-05
+DOLocation_perimeter: 0.0391305015633
+
+DOLocationID: 194
+DOLocation_area: 0.000273481702719
+DOLocation_perimeter: 0.0817938353532
+
+DOLocationID: 202
+DOLocation_area: 0.000106175396322
+DOLocation_perimeter: 0.0699215712618
+
+DOLocationID: 211
+DOLocation_area: 3.9729196609e-05
+DOLocation_perimeter: 0.0252345082132
+
+DOLocationID: 224
+DOLocation_area: 9.8478698914e-05
+DOLocation_perimeter: 0.0440204462769
+
+DOLocationID: 232
+DOLocation_area: 0.000216049973456
+DOLocation_perimeter: 0.0614709085331
+
+DOLocationID: 263
+DOLocation_area: 6.5769766417e-05
+DOLocation_perimeter: 0.0370166252994
+
+DOLocationID: 120
+DOLocation_area: 9.3146282131e-05
+DOLocation_perimeter: 0.0832612702158
+
+DOLocationID: 153
+DOLocation_area: 3.2468496482e-05
+DOLocation_perimeter: 0.024737239022
+
+DOLocationID: 128
+DOLocation_area: 0.000207405982869
+DOLocation_perimeter: 0.0702090290681
+
