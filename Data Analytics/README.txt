@@ -14,15 +14,16 @@ to where the relevant csv files etc are located on your computer after downloadi
 README files in each subfolder labelled Train 1 Train 2 etc and can be accessed from the google drive 
 they are stored in if necessary by using the links provided in the readme files in each of the Train folders Train 1 Train 2 etc.
 
+It is very important to consider that only files opened for reading and editing have been linked as the output files of a notebook are the input 
+files of the next notebook (the notebooks the listed in order in the readme files) as such it is not necessary to link the same files twice.
+
 The document labelled data2 enclosed in the same folder as this document contains all the 
 taxi zones used for the machine learning 
 it includes the locationid and the areas and perimeters of the taxi zones used in the models.
 Virtually all manhatten taxi zones have been used bar 2 or 3 due to ambiguity of needed features
 like the area of the taxi zone as it was instrumental to the target feature 
 
-
-
--The main datasets used include 
+The main datasets used include 
 
 (1) the 2019 NYC Yellow taxi trips data, available at:
 https://data.cityofnewyork.us/Transportation/2019-Yellow-Taxi-Trip-Data/2upf-qytp
