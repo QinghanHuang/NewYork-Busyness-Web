@@ -15,12 +15,6 @@ PKl file for Train 7
 https://drive.google.com/file/d/1cTv0hKbQb78lFvssCZFKDsBIf1_aqAZF/view?usp=sharing
 
 
-feature importances 
-
-
-https://drive.google.com/file/d/1U3tN0yZbm8boYbyT0l0_QD_xO8D9Av6x/view?usp=sharing
-
-
 
 (1) Filtertomanhatten - filters out the non manhatten aspects of the data.
 
