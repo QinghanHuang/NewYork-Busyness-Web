@@ -17,6 +17,22 @@ they are stored in if necessary by using the links provided in the readme files 
 It is very important to consider that only files opened for reading and editing have been linked as the output files of a notebook are the input 
 files of the next notebook (the notebooks the listed in order in the readme files) as such it is not necessary to link the same files twice.
 
+NB There are 11 total train. Below is a description of each train 
+
+Train 1: Random forest, 2019 NYC Yellow taxis dataset (no weather data)
+Train 2: Random forest, 2019 Yellow Taxis + Openweather data 
+Train 3: Random forest, 2019 yellow taxis + 2018 yellow taxis no weather 
+Train 4: Random forest, 2019 NYC Yellow taxis dataset (no weather data) but with some changes to features to test whether 
+changes to features will change the accuracy.
+Train 5: Random forest, 2019 NYC Yellow taxis dataset (no weather data) but with hyperparameter change to test effect on accuracy 
+Train 6: Random forest, 2019 NYC Yellow taxis dataset (no weather data) Deployment model (since weather data doesnt increase accuracy of predictions) 
+Train 7: Logistic regression, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+Train 8:  K-nearest-neighbour classifier , 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+Train 9:  Decision tree classifier, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+Train 10:  XGB classifier , 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+Train 11: Neural network, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+
+
 The document labelled data2 enclosed in the same folder as this document contains all the 
 taxi zones used for the machine learning 
 it includes the locationid and the areas and perimeters of the taxi zones used in the models.
