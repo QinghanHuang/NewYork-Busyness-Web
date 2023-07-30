@@ -14,6 +14,10 @@ PKl file for Train 6
 
 https://drive.google.com/file/d/1-rh_Z16j54T8_sPfEirYZYY7ZLIauASs/view?usp=sharing
 
+pmml file for train 6 (used pmml instead of pkl due to backened using java) 
+
+https://drive.google.com/file/d/1-j7LVMGjNvT6R3Vek65ReDHQv6UVxL5n/view?usp=sharing
+
 
 feature importances 
 
