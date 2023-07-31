@@ -2,7 +2,6 @@ package com.clement.service.impl;
 
 import com.clement.dao.PoiMapper;
 import com.clement.pojo.prediction.PoiBusy;
-import com.clement.pojo.prediction.ZoneBusy;
 import com.clement.service.DemoPmmlModelService;
 import com.clement.service.PredictionService;
 import jakarta.annotation.PostConstruct;
@@ -36,8 +35,8 @@ public class PredictionServiceImpl implements PredictionService {
     @Resource
     DemoPmmlModelService model;
 
-    @Resource(name = "redisTemplateZoneBusys")
-    RedisTemplate<String, List<ZoneBusy>> redisTemplateZoneBusys;
+//    @Resource(name = "redisTemplateZoneBusys")
+//    RedisTemplate<String, List<ZoneBusy>> redisTemplateZoneBusys;
 
     @Resource(name = "redisTemplatePoiBusys")
     RedisTemplate<String, List<PoiBusy>> redisTemplatePoiBusys;
@@ -69,65 +68,82 @@ public class PredictionServiceImpl implements PredictionService {
 
     @Scheduled(fixedRate = 6 * 60 * 60 * 1000) // 6 hour (in milliseconds)
     public void getAndCacheZoneBusys() {
-        List<ZoneBusy> zoneBusyList = getZoneBusysFromModel();
-        List<PoiBusy> poiBusyList = getPoiBusysFromModel();
-        redisTemplateZoneBusys.opsForValue().set("zone-busys", zoneBusyList, 6 * 60, TimeUnit.MINUTES);
-        redisTemplatePoiBusys.opsForValue().set("poi-busys", poiBusyList, 6 * 60, TimeUnit.MINUTES);
+        cachePoiBusys();
     }
 
-    @Override
-    public List<ZoneBusy> getZoneBusys(LocalDate date) {
-        //check if there is cache in redis
-        List<ZoneBusy> redisZoneBusys = redisTemplateZoneBusys.opsForValue().get("zone-busys");
-        if (redisZoneBusys != null) {
-            return redisZoneBusys;
-        }
-        return getZoneBusysFromModel();
-    }
+//    @Override
+//    public List<ZoneBusy> getZoneBusys(LocalDate date) {
+//        //check if there is cache in redis
+//        List<ZoneBusy> redisZoneBusys = redisTemplateZoneBusys.opsForValue().get("zone-busys");
+//        if (redisZoneBusys != null) {
+//            return redisZoneBusys;
+//        }
+//        return getZoneBusysFromModel();
+//    }
 
-    public List<ZoneBusy> getZoneBusysFromModel() {
-        LocalDate today = LocalDate.now(ZoneId.of("America/New_York"));
-        List<ZoneBusy> zoneBusyList = new ArrayList<>();
-        int i = 0;
-        // cache busyness of 3 days
-        while (i < 3) {
-            double month = (double) today.getMonth().getValue();
-            double dayOfMonth = (double) today.getDayOfMonth();
-            double dayOfWeek = (double) today.getDayOfWeek().getValue() - 1;
-
-            for (int hour = 0; hour < 24; hour++) {
-                for (int locationId : locationIds) {
-                    Double area = getAreaByZid.get(locationId);
-                    int busy = model.predict((double) locationId, month, dayOfMonth, dayOfWeek, (double) hour, area);
-                    LocalDateTime time = today.atTime(hour, 0);
-                    zoneBusyList.add(new ZoneBusy(time, locationId, busy));
-                }
-            }
-            i++;
-            today = today.plusDays(1);
-        }
-
-        redisTemplateZoneBusys.opsForValue().set("zone-busys", zoneBusyList, 6 * 60, TimeUnit.MINUTES);
-
-        return zoneBusyList;
-
-    }
+//    public List<ZoneBusy> getZoneBusysFromModel() {
+//        LocalDate today = LocalDate.now(ZoneId.of("America/New_York"));
+//        List<ZoneBusy> zoneBusyList = new ArrayList<>();
+//        int i = 0;
+//        // cache busyness of 3 days
+//        while (i < 3) {
+//            double month = (double) today.getMonth().getValue();
+//            double dayOfMonth = (double) today.getDayOfMonth();
+//            double dayOfWeek = (double) today.getDayOfWeek().getValue() - 1;
+//
+//            for (int hour = 0; hour < 24; hour++) {
+//                for (int locationId : locationIds) {
+//                    Double area = getAreaByZid.get(locationId);
+//                    int busy = model.predict((double) locationId, month, dayOfMonth, dayOfWeek, (double) hour, area);
+//                    LocalDateTime time = today.atTime(hour, 0);
+//                    zoneBusyList.add(new ZoneBusy(time, locationId, busy));
+//                }
+//            }
+//            i++;
+//            today = today.plusDays(1);
+//        }
+//
+//        redisTemplateZoneBusys.opsForValue().set("zone-busys", zoneBusyList, 6 * 60, TimeUnit.MINUTES);
+//
+//        return zoneBusyList;
+//
+//    }
 
     @Override
     public List<PoiBusy> getPoiBusys(LocalDate date) {
         //check if there is cache in redis
-        List<PoiBusy> redisPoiBusys = redisTemplatePoiBusys.opsForValue().get("poi-busys");
+        List<PoiBusy> redisPoiBusys = redisTemplatePoiBusys.opsForValue().get("poi-busys:" + date);
         if (redisPoiBusys != null) {
             return redisPoiBusys;
         }
-        return getPoiBusysFromModel();
+
+        double month = (double) date.getMonth().getValue();
+        double dayOfMonth = (double) date.getDayOfMonth();
+        double dayOfWeek = (double) date.getDayOfWeek().getValue() - 1;
+
+        List<PoiBusy> poiBusyList = new ArrayList<>();
+
+        for (int hour = 0; hour < 24; hour++) {
+            for (Integer pid : pids) {
+                double zid = (double) getZid.get(pid);
+                double area = getAreaByPid.get(pid);
+
+                int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, (double) hour, area);
+
+                LocalDateTime time = date.atTime(hour, 0);
+                poiBusyList.add(new PoiBusy(time, pid, busy));
+            }
+        }
+        redisTemplatePoiBusys.opsForValue().set("poi-busys:" + date, poiBusyList, 6 * 60, TimeUnit.MINUTES);
+        return poiBusyList;
     }
 
-    public List<PoiBusy> getPoiBusysFromModel() {
+    public void cachePoiBusys() {
         LocalDate today = LocalDate.now(ZoneId.of("America/New_York"));
-        List<PoiBusy> poiBusyList = new ArrayList<>();
+
         int i = 0;
         while (i < 3) {
+            List<PoiBusy> poiBusyList = new ArrayList<>();
 
             double month = (double) today.getMonth().getValue();
             double dayOfMonth = (double) today.getDayOfMonth();
@@ -144,13 +160,10 @@ public class PredictionServiceImpl implements PredictionService {
                     poiBusyList.add(new PoiBusy(time, pid, busy));
                 }
             }
+            redisTemplatePoiBusys.opsForValue().set("poi-busys:" + today, poiBusyList, 6 * 60, TimeUnit.MINUTES);
             i++;
             today = today.plusDays(1);
         }
-
-        redisTemplatePoiBusys.opsForValue().set("poi-busys", poiBusyList, 6 * 60, TimeUnit.MINUTES);
-
-        return poiBusyList;
     }
 
     public PoiBusy getPoiBusyById(int id, LocalDateTime time) {

@@ -42,8 +42,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Scheduled(fixedRate = 60 * 60 * 1000) // 1 hour (in milliseconds)
     public void fetchAndCacheWeatherData() {
         try {
-            List<Weather> weathers = fetchWeatherDataFromApi();
-            redisTemplate.opsForValue().set("forecast-weather", weathers, 60, TimeUnit.MINUTES);
+            fetchWeatherDataFromApi();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

@@ -2,7 +2,6 @@ package com.clement.controller;
 
 import com.clement.pojo.RestBean;
 import com.clement.pojo.prediction.PoiBusy;
-import com.clement.pojo.prediction.ZoneBusy;
 import com.clement.service.impl.PredictionServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,15 +26,15 @@ public class PredictionController {
 
     @Resource(name= "predictionServiceImpl")
     private PredictionServiceImpl predictionService;
-    @GetMapping("/zone/{date}")
-    public RestBean<List<ZoneBusy>> predictZoneBusys(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        try {
-            List<ZoneBusy> zoneBusys = predictionService.getZoneBusys(date);
-            return RestBean.succcess(zoneBusys);
-        } catch (IllegalArgumentException e){
-            return RestBean.failure(400, null);
-        }
-    }
+//    @GetMapping("/zone/{date}")
+//    public RestBean<List<ZoneBusy>> predictZoneBusys(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+//        try {
+//            List<ZoneBusy> zoneBusys = predictionService.getZoneBusys(date);
+//            return RestBean.succcess(zoneBusys);
+//        } catch (IllegalArgumentException e){
+//            return RestBean.failure(400, null);
+//        }
+//    }
     @GetMapping("/poi/{date}")
     public RestBean<List<PoiBusy>> predictPoiBusys(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         try {
