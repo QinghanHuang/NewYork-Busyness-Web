@@ -42,9 +42,6 @@ public class PredictionServiceImpl implements PredictionService {
     @Resource(name = "redisTemplatePoiBusys")
     RedisTemplate<String, List<PoiBusy>> redisTemplatePoiBusys;
 
-//    @Resource(name = "redisTemplatePoiBusy")
-//    RedisTemplate<String, PoiBusy> redisTemplatePoiBusy;
-
     List<Integer> locationIds;
     List<Integer> pids;
     Map<Integer, Integer> getZid;
@@ -70,7 +67,7 @@ public class PredictionServiceImpl implements PredictionService {
         }
     }
 
-    @Scheduled(fixedRate = 6* 60 * 60 * 1000) // 6 hour (in milliseconds)
+    @Scheduled(fixedRate = 6 * 60 * 60 * 1000) // 6 hour (in milliseconds)
     public void getAndCacheZoneBusys() {
         List<ZoneBusy> zoneBusyList = getZoneBusysFromModel();
         List<PoiBusy> poiBusyList = getPoiBusysFromModel();
@@ -130,7 +127,7 @@ public class PredictionServiceImpl implements PredictionService {
         LocalDate today = LocalDate.now(ZoneId.of("America/New_York"));
         List<PoiBusy> poiBusyList = new ArrayList<>();
         int i = 0;
-        while(i < 3) {
+        while (i < 3) {
 
             double month = (double) today.getMonth().getValue();
             double dayOfMonth = (double) today.getDayOfMonth();
@@ -156,39 +153,15 @@ public class PredictionServiceImpl implements PredictionService {
         return poiBusyList;
     }
 
+    public PoiBusy getPoiBusyById(int id, LocalDateTime time) {
+        double zid = (double) getZid.get(id);
+        double area = getAreaByPid.get(id);
+        double month = (double) time.getMonth().getValue();
+        double dayOfMonth = (double) time.getDayOfMonth();
+        double dayOfWeek = (double) time.getDayOfWeek().getValue() - 1;
+        double hour = (double) time.getHour();
 
-    // TODO: cache
-    public PoiBusy getPoiBusyById(int id, LocalDateTime time){
-        double zid= (double)getZid.get(id);
-        double area= getAreaByPid.get(id);
-        double month=(double)time.getMonth().getValue();
-        double dayOfMonth=(double)time.getDayOfMonth();
-        double dayOfWeek = (double)time.getDayOfWeek().getValue()-1;
-        double hour = (double)time.getHour();
-
-        int busy =model.predict(zid,month,dayOfMonth,dayOfWeek,hour,area);
-        return new PoiBusy(time,id,busy);
+        int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, hour, area);
+        return new PoiBusy(time, id, busy);
     }
-//    public PoiBusy getPoiBusyById(int id, LocalDateTime time){
-//        //check if there is cache in redis
-//        PoiBusy redisPoiBusy = redisTemplatePoiBusy.opsForValue().get(String.valueOf(id) + "&" + time);
-//        if(redisPoiBusy != null){
-//            return redisPoiBusy;
-//        }
-//
-//        Double zid= (double)getZid.get(id);
-//        Double area= getAreaByPid.get(id);
-//        Double month=(double)time.getMonth().getValue();
-//        Double dayOfMonth=(double)time.getDayOfMonth();
-//        Double dayOfWeek = (double)time.getDayOfWeek().getValue()-1;
-//        Double hour = (double)time.getHour();
-//
-//        int busy = model.predict(zid,month,dayOfMonth,dayOfWeek,hour,area);
-//
-//        PoiBusy poiBusy = new PoiBusy(time, id ,busy);
-//
-//        redisTemplatePoiBusy.opsForValue().set(String.valueOf(id) + "&" + time, poiBusy, 60, TimeUnit.MINUTES);
-//
-//        return new PoiBusy(time,id,busy);
-//    }
 }

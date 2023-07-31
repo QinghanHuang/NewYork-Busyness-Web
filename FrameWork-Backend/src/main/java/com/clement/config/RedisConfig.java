@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.util.List;
 
@@ -28,12 +27,7 @@ public class RedisConfig {
         template.setConnectionFactory(redisConnectionFactory);
         //use JsonRedisSerializer
         template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-        // handle the serialization of LocalDateTime
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.findAndRegisterModules(); // Make sure the JSR310 module is registered
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-        template.setValueSerializer(serializer);
+
         return template;
     }
 
@@ -66,19 +60,4 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "redisTemplatePoiBusy")
-    public RedisTemplate<String, PoiBusy> redisTemplatePoiBusy(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, PoiBusy> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
-        //use JsonRedisSerializer
-        template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.findAndRegisterModules(); // Make sure the JSR310 module is registered
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-        template.setValueSerializer(serializer);
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        return template;
-    }
 }
