@@ -25,7 +25,7 @@ public class DemoPmmlModelService {
         }
     }
 
-    public int predict(Double id,Double month,Double dayOfMonth,Double dayOfWeek,Double hour,Double area) {
+    public int predict(double id,double month,double dayOfMonth,double dayOfWeek,double hour,double area) {
         // Convert the input data to the format expected by the Evaluator
         Map<String, Double> inputData = new HashMap<>();
         inputData.put("DOLocationID", id);
@@ -37,11 +37,10 @@ public class DemoPmmlModelService {
 
         // Evaluate the model with the input data
         Map<String, ?> result = evaluator.evaluate(inputData);
-        System.out.println(result);
+        // System.out.println(result);
 
         // Get the predicted output value (assuming the output is a single integer value)
-        return (Integer) result.get("predicted_busyness");
-
+        return (int) result.get("predicted_busyness");
     }
 
 }

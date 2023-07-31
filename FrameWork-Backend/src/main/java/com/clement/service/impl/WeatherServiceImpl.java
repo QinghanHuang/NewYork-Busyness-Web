@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,6 +39,14 @@ public class WeatherServiceImpl implements WeatherService {
     @Resource
     RedisTemplate<String, List<Weather>> redisTemplate;
 
+    @Scheduled(fixedRate = 60 * 60 * 1000) // 1 hour (in milliseconds)
+    public void fetchAndCacheWeatherData() {
+        try {
+            fetchWeatherDataFromApi();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public List<Weather> getForecastWeathers() throws JsonProcessingException {
         //check if there is cache in redis
@@ -45,8 +54,10 @@ public class WeatherServiceImpl implements WeatherService {
         if (redisWeathers != null) {
             return redisWeathers;
         }
+        return fetchWeatherDataFromApi();
+    }
 
-        //if no call api to fetch weather
+    private List<Weather> fetchWeatherDataFromApi() throws JsonProcessingException {
         String weatherResp = restTemplate.getForObject(weatherUrl, String.class);
         //read json by objectMapper
         JsonNode weatherJson = objectMapper
@@ -63,7 +74,6 @@ public class WeatherServiceImpl implements WeatherService {
             //get each element in list
             JsonNode weatherNode = weatherJson.get(i);
 
-
             //combine data we want
             String date = today.toString();
             String dayOfWeek = today.getDayOfWeek().toString();
@@ -79,15 +89,12 @@ public class WeatherServiceImpl implements WeatherService {
             //add it into list
             weathers.add(weather);
 
-
-//            store weathers in redis in json
-            redisTemplate.opsForValue().set("forecast-weather", weathers, 60, TimeUnit.MINUTES);
-
             //add i
             i = i == 0 ? i + 7 : i + 8;
             today = today.plusDays(1);
         }
-
+        // store weathers in redis in json (take it out from the loop to avoid repetition)
+        redisTemplate.opsForValue().set("forecast-weather", weathers, 60, TimeUnit.MINUTES);
 
         return weathers;
     }

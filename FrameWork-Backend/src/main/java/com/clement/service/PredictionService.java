@@ -1,16 +1,14 @@
 package com.clement.service;
 
 import com.clement.pojo.prediction.PoiBusy;
-import com.clement.pojo.prediction.ZoneBusy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 public interface PredictionService {
 
-    List<ZoneBusy> getZoneBusys(LocalDate date);
+    //List<ZoneBusy> getZoneBusys(LocalDate date);
 
     List<PoiBusy> getPoiBusys(LocalDate date);
 
