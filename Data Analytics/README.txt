@@ -25,12 +25,13 @@ Train 3: Random forest, 2019 yellow taxis + 2018 yellow taxis no weather
 Train 4: Random forest, 2019 NYC Yellow taxis dataset (no weather data) but with some changes to features to test whether 
 changes to features will change the accuracy.
 Train 5: Random forest, 2019 NYC Yellow taxis dataset (no weather data) but with hyperparameter change to test effect on accuracy 
-Train 6: Random forest, 2019 NYC Yellow taxis dataset (no weather data) Deployment model (since weather data doesnt increase accuracy of predictions) 
+Train 6: Random forest, 2019 NYC Yellow taxis dataset (no weather data) Deployment model 1st version (not final)
 Train 7: Logistic regression, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
 Train 8:  K-nearest-neighbour classifier , 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
 Train 9:  Decision tree classifier, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
 Train 10:  XGB classifier , 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
 Train 11: Neural network, 2019 NYC Yellow taxis dataset (no weather data) for comparison to random forest for algorithm selection
+Train 12: Random forest, 2019 NYC Yellow taxis dataset (includes weather data for most important weather features) Deployment model 2nd version
 
 
 The document labelled data2 enclosed in the same folder as this document contains all the 
