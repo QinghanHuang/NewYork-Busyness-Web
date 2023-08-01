@@ -1,6 +1,6 @@
 This folder contains the files needed to replicate training run 6 
 
-This is a simplified training run of the random forest model for the current deployment. There are hardware and file size limits for current deployment so this model is smaller and uses fewer features. When the product is further developed this version may be scaled further.
+This is a simplified training run of the random forest model for the current deployment version 1. There is a version 2 which is an updated version including the most important weather features in the Train 12 folder 
 
 The following notebooks are enclosed but some of the notebooks purposes may overlap i.e there may be further cleaning done in the train file. 
 The notebooks are IN THE ORDER THAT THEY WERE RUN IN. In addition to the CSVs below the taxizones csv is available 
