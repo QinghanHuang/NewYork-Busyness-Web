@@ -32,7 +32,7 @@ public class ModelTest {
     public void test() {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            int predict = pmmlModelService.predict(41.0, 11.0, 20.0, 5.0, i * 1.0, 0.000143093038);
+            int predict = pmmlModelService.predict(41.0, 11.0, 20.0, 5.0, i * 1.0, 0.000143093038,0.052793109453000000);
             list.add(predict);
         }
         System.out.println(list);
@@ -58,7 +58,7 @@ public class ModelTest {
     public void test3() {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            LocalDateTime time = LocalDateTime.of(2023,7,27,i,0);
+            LocalDateTime time = LocalDateTime.of(2023,8,2,i,0);
             PoiBusy poiBusyById = predictionService.getPoiBusyById(1, time);
 
             list.add(poiBusyById.getBusy());

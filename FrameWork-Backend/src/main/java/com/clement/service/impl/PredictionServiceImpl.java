@@ -45,7 +45,7 @@ public class PredictionServiceImpl implements PredictionService {
     List<Integer> pids;
     Map<Integer, Integer> getZid;
     Map<Integer, Double> getAreaByPid;
-    Map<Integer, Double> getAreaByZid;
+    Map<Integer,Double> getPerimeterByPid;
 
     @PostConstruct
     public void init() {
@@ -53,16 +53,14 @@ public class PredictionServiceImpl implements PredictionService {
         pids = mapper.getIds();
         getZid = new HashMap<>();
         getAreaByPid = new HashMap<>();
+        getPerimeterByPid=new HashMap<>();
         for (Integer pid : pids) {
             int zid = mapper.getZidById(pid);
             getZid.put(pid, zid);
             double area = mapper.getAreaByPid(pid);
             getAreaByPid.put(pid, area);
-        }
-        getAreaByZid = new HashMap<>();
-        for (Integer locationId : locationIds) {
-            double area = mapper.getAreaByZid(locationId);
-            getAreaByZid.put(locationId, area);
+            double perimeter=mapper.getPerimeterByPid(pid);
+            getPerimeterByPid.put(pid,perimeter);
         }
     }
 
@@ -127,8 +125,9 @@ public class PredictionServiceImpl implements PredictionService {
             for (Integer pid : pids) {
                 double zid = (double) getZid.get(pid);
                 double area = getAreaByPid.get(pid);
+                double perimeter= getPerimeterByPid.get(pid);
 
-                int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, (double) hour, area);
+                int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, (double) hour, area,perimeter);
 
                 LocalDateTime time = date.atTime(hour, 0);
                 poiBusyList.add(new PoiBusy(time, pid, busy));
@@ -154,8 +153,9 @@ public class PredictionServiceImpl implements PredictionService {
                 for (Integer pid : pids) {
                     double zid = (double) getZid.get(pid);
                     double area = getAreaByPid.get(pid);
+                    double perimeter= getPerimeterByPid.get(pid);
 
-                    int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, (double) hour, area);
+                    int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, (double) hour, area,perimeter);
                     LocalDateTime time = today.atTime(hour, 0);
                     poiBusyList.add(new PoiBusy(time, pid, busy));
                 }
@@ -173,8 +173,9 @@ public class PredictionServiceImpl implements PredictionService {
         double dayOfMonth = (double) time.getDayOfMonth();
         double dayOfWeek = (double) time.getDayOfWeek().getValue() - 1;
         double hour = (double) time.getHour();
+        double perimeter= getPerimeterByPid.get(id);
 
-        int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, hour, area);
+        int busy = model.predict(zid, month, dayOfMonth, dayOfWeek, hour, area,perimeter);
         return new PoiBusy(time, id, busy);
     }
 }

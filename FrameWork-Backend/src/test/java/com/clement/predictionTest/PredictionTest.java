@@ -17,14 +17,7 @@ public class PredictionTest {
 
     @Resource
     PredictionService predictionService;
-//    @Test
-//    public void getZoneBusysTest() {
-//
-//        LocalDate today = LocalDate.now();
-//        List<ZoneBusy> zoneBusyList = predictionService.getPoiBusys(today);
-//        System.out.println(zoneBusyList);
-//
-//    }
+
 
     @Test
     public void getPoiBusysTest() {
