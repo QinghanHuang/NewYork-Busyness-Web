@@ -41,7 +41,7 @@ the CSV file used to load at the start of this notebook is available at
 
 https://drive.google.com/file/d/1ZTyTZ9s0yZVuJlvEO-L2QnC0F92bmeUa/view?usp=sharing
 
-(5) 6_0train
+(5) 6_0Btrain
 
 the file where the model is trained. Includes test metrics The CSV loaded at the start of the file is available at 
 
