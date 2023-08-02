@@ -60,7 +60,7 @@ https://drive.google.com/file/d/1HGPrgkFAMeSiqHNP10Ph-FfsFkJGixVH/view?usp=shari
 
 
 
-(5) 6_012train.ipynb (train file)
+(5) 12_012D(1)train.ipynb (train file)
 the file where the model is trained. Includes test metrics The CSV loaded at the start of the file is available at 
 
 https://drive.google.com/file/d/1qj4WEG7ipvuhXkBjQiv5Y65g6_lkd_8-/view?usp=sharing
