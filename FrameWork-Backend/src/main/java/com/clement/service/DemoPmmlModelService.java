@@ -16,7 +16,7 @@ public class DemoPmmlModelService {
     public DemoPmmlModelService() {
         // Load PMML model from the resource folder
         try {
-            ClassPathResource pmmlResource = new ClassPathResource("model_727.pmml");
+            ClassPathResource pmmlResource = new ClassPathResource("model6.012B.pmml");
             PMML pmml = org.jpmml.model.PMMLUtil.unmarshal(pmmlResource.getInputStream());
             EvaluatorBuilder evaluatorBuilder = new ModelEvaluatorBuilder(pmml);
             evaluator = evaluatorBuilder.build();
@@ -25,7 +25,7 @@ public class DemoPmmlModelService {
         }
     }
 
-    public int predict(double id,double month,double dayOfMonth,double dayOfWeek,double hour,double area) {
+    public int predict(double id,double month,double dayOfMonth,double dayOfWeek,double hour,double area,double perimeter) {
         // Convert the input data to the format expected by the Evaluator
         Map<String, Double> inputData = new HashMap<>();
         inputData.put("DOLocationID", id);
@@ -34,6 +34,7 @@ public class DemoPmmlModelService {
         inputData.put("dropoff_day_of_week", dayOfWeek);
         inputData.put("dropoff_day_of_month", dayOfMonth);
         inputData.put("dropoff_month", month);
+        inputData.put("DOLocation_perimeter", perimeter);
 
         // Evaluate the model with the input data
         Map<String, ?> result = evaluator.evaluate(inputData);
