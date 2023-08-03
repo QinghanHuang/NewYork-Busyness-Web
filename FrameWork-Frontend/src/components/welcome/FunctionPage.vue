@@ -8,15 +8,7 @@
     "
   >
     <div>
-      <div
-        style="
-          position: absolute;
-          left: 15px;
-          top: 10px;
-          border-radius: 5px;
-          padding: 5px;
-        "
-      >
+      <div style="position: absolute; left: 15px; top: 10px; border-radius: 5px; padding: 5px">
         <img
           src="../../assets/logo/logo_icon.png"
           alt="logo_icon"
@@ -68,7 +60,6 @@
                   v-model="column.selectedDate"
                   type="date"
                   placeholder="Pick a Day"
-                  style="width: 100px"
                   format="YYYY/MM/DD"
                   value-format="YYYY-MM-DD"
                 />
@@ -81,7 +72,6 @@
                   step="01:00"
                   end="23:00"
                   placeholder="Time"
-                  style="width: 90px"
                 />
                 <el-tooltip
                   effect="dark"
@@ -90,9 +80,8 @@
                 >
                   <el-select
                     v-model="column.selectedLocation"
-                    placeholder="Locations"
-                    class="selection"
-                    style="width: 100px"
+                    placeholder="Select a Location"
+                    class="selection-location"
                     size="small"
                   >
                     <el-option
@@ -102,17 +91,17 @@
                       :value="location"
                     /> </el-select
                 ></el-tooltip>
+                <span style="margin-left: 10px; color: #ff914d">Busy Level:</span>
                 <el-rate
                   v-model="column.busyLevel"
+                  size=large
                   :icons="icons"
-                  :disabled-void-icon="Minus"
                   show-score
                   score-template="{value}"
                   disabled
                   disabled-void-color="#305a92"
                   :colors="['#00c763', '#FF9900', '#dc4d4d']"
                   style="width: 50px; position: relative; top: 3px; left: 8px"
-                  size="small"
                 />
               </div>
             </transition>
@@ -139,6 +128,8 @@ import {
   SuccessFilled,
   WarningFilled,
   CircleCloseFilled,
+  OfficeBuilding,
+  Van,
 } from "@element-plus/icons-vue";
 
 const store = useStore();
@@ -162,7 +153,8 @@ const columns = ref([
   },
 ]);
 
-const icons = [SuccessFilled, WarningFilled, CircleCloseFilled];
+// const icons = [SuccessFilled, WarningFilled, CircleCloseFilled];
+const icons = [OfficeBuilding, OfficeBuilding, OfficeBuilding]
 let locations;
 
 const getIdByName = (name) => {
@@ -328,7 +320,7 @@ const toggleSelection = (column) => {
 .func {
   overflow-x: hidden;
 
-  width: 96%;
+  width: 94%;
   height: 60vh;
   margin-top: 35px;
   border-radius: 5px;
@@ -344,7 +336,6 @@ const toggleSelection = (column) => {
       display: flex;
       flex-direction: row;
       align-items: center;
-      margin-left: 30px;
       margin-top: 20px;
     }
 
@@ -352,6 +343,25 @@ const toggleSelection = (column) => {
       margin-left: 8px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
       border-radius: 4px;
+      width: 200px;
+
+      @media (max-width: 600px) {
+        width: 125px
+      }
+  
+    }
+
+    .selection-location {
+      margin-left: 8px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+      border-radius: 4px;
+      margin-top: 8px;
+      width: 408px;
+      
+
+      @media (max-width: 600px) {
+        width: 258px
+      }
     }
 
     .el-rate__text {

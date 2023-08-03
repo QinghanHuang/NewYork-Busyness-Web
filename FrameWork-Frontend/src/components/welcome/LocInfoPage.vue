@@ -47,7 +47,6 @@
         {{ locationDes }}
       </p>
     </div>
-    <div v-if="!isSmall" @click="clear()" class="close">------click Here to close------</div>
   </div>
 </template>
 
@@ -182,20 +181,6 @@ onMounted(() => {});
     border-radius: 4px;
     background: var(--el-color-danger-light-9);
     color: var(--el-color-danger);
-  }
-}
-
-.close {
-  position: absolute;
-  bottom: 2%;
-  color: #ff914d;
-  text-align: center;
-  width: 100%;
-
-  &:hover {
-    color: #00989a;
-    cursor: pointer;
-    // background-color: rgb(38, 52, 67),
   }
 }
 

@@ -7,6 +7,8 @@ import {
   Plus,
   DArrowRight,
   Close,
+  ArrowRightBold,
+  ArrowDownBold,
 } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watchEffect, Transition, computed } from "vue";
 import { useStore } from "vuex";
@@ -65,6 +67,7 @@ const weatherWindowTrigger = ref(null);
 const weatherWindowPlacement = ref(null);
 const openSideBarButtonStyle = ref({});
 const titleBarStyle = ref({});
+const infoWindowCloseBtnStyle = ref({});
 const colorDict = {
   1: "green",
   2: "blue",
@@ -84,8 +87,16 @@ watchEffect(() => {
   const isSmall = isSmallScreen.value;
   weatherWindowTrigger.value = isSmall ? "click" : "hover";
   weatherWindowPlacement.value = isSmall ? "right" : "right";
+  infoWindowCloseBtnStyle.value = {
+    position: "absolute",
+    right: isSmall ? "15px" : "500px",
+    top: isSmall ? "calc(60vh - 32px)" : "45%",
+  };
   titleBarStyle.value = {
     width: isSmall ? "" : "200px",
+    marginTop: isSmall ? "" : "17px",
+    marginRight: isSmall ? "" : "10px",
+    borderRadius: isSmall ? "" : "5px",
     right: "0px",
   };
   openSideBarButtonStyle.value = {
@@ -245,6 +256,12 @@ const setWeather = () => {
 
 // ----------------------map relative----------------------
 // move Map Center
+const moveHome = () => {
+  clear();
+  map.panTo({ lat: 40.74039, lng: -73.99937 });
+  map.setZoom(13);
+};
+
 function moveMapCenter(offsetX, offsetY) {
   const center = map.getCenter();
   const pixelOffset = new google.maps.Point(offsetX, offsetY);
@@ -504,8 +521,7 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 // show heatmap
 const showHeatmap = () => {
   if (isSmallScreen.value) store.commit("setInfoWindowShow", false);
-  map.panTo({ lat: 40.74039, lng: -73.99937 });
-  map.setZoom(13);
+  moveHome();
   heatMapObj.setMap(map);
   isHeatmap = true;
 };
@@ -681,11 +697,12 @@ onUnmounted(() => {
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
       <!-- title bar -->
-      <div class="title-bar" :style="titleBarStyle">
+      <div class="title-bar" :style="titleBarStyle" @click="moveHome">
         <img
           src="../assets/logo/logo_icon.png"
           alt="logo_icon"
           style="width: 20px; margin-right: 10px"
+          @click="moveHome"
         />
         <img src="../assets/logo/logo_text.png" alt="logo_icon" style="width: 110px" />
       </div>
@@ -774,16 +791,18 @@ onUnmounted(() => {
       </div>
 
       <!-- close info button -->
-      <div style="position: absolute; bottom: 350px; left: 87vw">
-        <el-button
-          style="box-shadow: 0px 0px 5px rgba(0, 0, 0, 1)"
-          v-show="infoWindowShow && isSmallScreen"
-          :icon="Close"
-          @click="closeInfo"
-          circle
-          size="large"
-        ></el-button>
-      </div>
+      <transition name="slide-in-left">
+        <div v-show="infoWindowShow" :style="infoWindowCloseBtnStyle">
+          <el-button
+            style="width: 30px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 1)"
+            :style="{
+              height: isSmallScreen ? '' : '70px',
+            }"
+            color="#305a92"
+            :icon="isSmallScreen ? ArrowDownBold : ArrowRightBold"
+            @click="closeInfo"
+          ></el-button></div
+      ></transition>
 
       <!-- weather part -->
       <div class="weather-part" v-show="computed(() => store.state.auth).value">
@@ -876,6 +895,13 @@ onUnmounted(() => {
   .slide-in-left-enter-from,
   .slide-in-left-leave-to {
     transform: translateX(500px);
+  }
+
+  @media (max-width: 600px) {
+    .slide-in-left-enter-from,
+    .slide-in-left-leave-to {
+      transform: translateY(100vh);
+    }
   }
 
   .map-view {
@@ -991,7 +1017,7 @@ onUnmounted(() => {
     z-index: 5;
   }
   .side-bar {
-    position: absolute;
+    position: fixed;
     top: 0;
     height: 100vh;
     display: flex;
