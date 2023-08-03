@@ -24,29 +24,39 @@ const router = createRouter({
                     name: 'welcome-forget',
                     component: () => import('@/components/welcome/ForgetPage.vue'),
 
+                },{
+                    path: 'func',
+                    name: 'welcome-func',
+                    component: () => import('@/components/welcome/FunctionPage.vue'),
+
+                },{
+                    path: 'set',
+                    name: 'welcome-set',
+                    component: () => import('@/components/welcome/SettingPage.vue'),
+
                 }
             ]
         }, {
-            path: '/index',
-            name: 'index',
-            component:() => import('@/views/IndexView.vue')
+            // path: '/func',
+            // name: 'index',
+            // component:() => import('@/views/IndexView.vue')
 
         }
 
     ]
 })
 
-router.beforeEach((to, from, next) => {
-    const store = useStore()
-    if(store.auth.user != null && to.name.startsWith('welcome-')) {
-        next('/index')
-    } else if(store.auth.user == null && to.fullPath.startsWith('/index')) {
-        next('/')
-    } else if(to.matched.length === 0){
-        next('/index')
-    } else {
-        next()
-    }
-})
+// router.beforeEach((to, from, next) => {
+//     const store = useStore()
+//     if(store.auth.user != null && to.name.startsWith('welcome-')) {
+//         next('/index')
+//     } else if(store.auth.user == null && to.fullPath.startsWith('/index')) {
+//         next('/')
+//     } else if(to.matched.length === 0){
+//         next('/index')
+//     } else {
+//         next()
+//     }
+// })
 
 export default router

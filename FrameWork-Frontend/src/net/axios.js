@@ -4,8 +4,8 @@ import {ElMessage} from "element-plus";
 const defaultError=()=>ElMessage.error("Something wrong, Please contact with admin!");
 const defaultFailure=(message)=>ElMessage.warning(message)
 
-function  post(url,data,success,failure=defaultFailure,error=defaultFailure){
-    axios.post(url,data,{
+async function post(url,data,success,failure=defaultFailure,error=defaultError){
+    await axios.post(url,data,{
         headers:{
             'Content-Type':'application/x-www-form-urlencoded'
         },
@@ -18,8 +18,12 @@ function  post(url,data,success,failure=defaultFailure,error=defaultFailure){
         }
     }).catch(error)
 }
-function  get(url,success,failure=defaultFailure,error=defaultFailure){
-    axios.get(url,{
+
+async function postJson(url,data,success,failure=defaultFailure,error=defaultError){
+    await axios.post(url,data,{
+        headers:{
+            'Content-Type':'application/json'
+        },
         withCredentials:true
     }).then(({data})=>{
         if(data.success){
@@ -29,4 +33,16 @@ function  get(url,success,failure=defaultFailure,error=defaultFailure){
         }
     }).catch(error)
 }
-export {get,post}
+
+async function  get(url,success,failure=defaultFailure,error=defaultError){
+    await axios.get(url,{
+        withCredentials:true
+    }).then(({data})=>{
+        if(data.success){
+            success(data.message,data.status)
+        }else{
+            failure(data.message,data.status)
+        }
+    }).catch(error)
+}
+export {get,post,postJson}
