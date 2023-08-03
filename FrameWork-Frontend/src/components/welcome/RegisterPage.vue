@@ -60,9 +60,7 @@ const rules = {
       trigger: ["blur", "change"],
     },
   ],
-  code: [
-    { required: true, message: "Please input verify code", trigger: "blur" },
-  ],
+  code: [{ required: true, message: "Please input verify code", trigger: "blur" }],
 };
 const isEmailValid = ref(false);
 const formRef = ref();
@@ -114,26 +112,28 @@ const validateEmail = () => {
 </script>
 
 <template>
-  <div style="text-align: center; margin: 0 20px; position: relative; top: -5vh">
-    <img src="../../assets/logo/ucdlogo.png" alt="ucd" style="width: 100px; padding-bottom: 20px;">
-    <div style="font-size: 25px; font-weight: bold">Sign Up</div>
-    <div style="font-size: 14px; color: grey">
+  <div style="text-align: center; margin: 0 30px; position: relative; top: -5vh">
+    <div style="margin-top: -20px;">
+      <img
+        src="../../assets/logo/logo_icon.png"
+        alt="ucd"
+        style="width: 40px; padding-bottom: 10px"
+      />&nbsp
+      <img
+        src="../../assets/logo/logo_text.png"
+        alt="ucd"
+        style="width: 130px; padding-bottom: 20px"
+      />
+    </div>
+    <hr style="margin-bottom: 20px;" />
+    <div style="font-size: 25px; font-weight: bold; color: #ff914d">Sign Up</div>
+    <div style="font-size: 14px; color: rgb(244, 244, 244)">
       Welcome,Please Input User Detail Below
     </div>
-    <div style="margin-top: 50px">
-      <el-form
-        :model="form"
-        :rules="rules"
-        @validate="onValidate"
-        ref="formRef"
-      >
+    <div style="margin-top: 30px">
+      <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
         <el-form-item prop="username">
-          <el-input
-            v-model="form.username"
-            maxlength="10"
-            type="text"
-            placeholder="Username"
-          >
+          <el-input v-model="form.username" maxlength="10" type="text" placeholder="Username">
             <template #prefix>
               <el-icon>
                 <User />
@@ -142,12 +142,7 @@ const validateEmail = () => {
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-            v-model="form.password"
-            maxlength="20"
-            type="password"
-            placeholder="Password"
-          >
+          <el-input v-model="form.password" maxlength="20" type="password" placeholder="Password">
             <template #prefix>
               <el-icon>
                 <Lock />
@@ -197,7 +192,7 @@ const validateEmail = () => {
             <el-col :span="7" style="text-align: right">
               <el-button
                 @click="validateEmail"
-                type="success"
+                color="#FF914d"
                 :disabled="!isEmailValid || coldTime > 0"
               >
                 {{ coldTime > 0 ? "Wait " + coldTime + " S" : "Get Code" }}
@@ -208,20 +203,17 @@ const validateEmail = () => {
       </el-form>
     </div>
     <div style="margin-top: 80px">
-      <el-button style="width: 270px" type="warning" @click="register" plain
-        >Register</el-button
-      >
+      <el-button style="width: 270px" color="#FF914d" @click="register" plain>Register</el-button>
     </div>
-    <div style="margin-top: 20px">------ 
-      <span style="font-size: 14px; line-height: 15px; color: grey"
+    <div style="margin-top: 20px; color: rgb(224, 224, 224)">
+      ------
+      <span style="font-size: 14px; line-height: 15px; color: rgb(216, 216, 216)"
         >Have a Account?
       </span>
-      <el-link
-        type="primary"
-        style="translate: 0 -2px"
-        @click.stop="router.push('/')"
+      <el-link type="warning" style="translate: 0 -2px" @click.stop="router.push('/')"
         >Sign In</el-link
-      > ------
+      >
+      ------
     </div>
   </div>
 </template>

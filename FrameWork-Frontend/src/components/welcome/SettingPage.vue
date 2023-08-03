@@ -1,7 +1,7 @@
 <template>
   <div class="this">
     <div class="title" style="position: absolute; top: 1%; margin-left: 2%; color: #343434">
-      <h1>Edit Profile</h1>
+      <h1 style="color: #FF914d;">Edit Profile</h1>
     </div>
     <div style="margin-top: 5%">
       <div class="avatar">
@@ -15,7 +15,7 @@
       </div>
       <el-divider />
       <el-form :model="form" label-width="100px" class="form">
-        <el-form-item label="Email">
+        <el-form-item label="Email" >
           <el-input disabled v-model="form.email" class="add-shadow" />
         </el-form-item>
         <el-form-item label="User Name">
@@ -49,8 +49,8 @@
           <el-input v-model="form.introduction" type="textarea" class="add-shadow" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">Save</el-button>
-          <el-button @click="back">Cancel</el-button>
+          <el-button color="#FF914d" @click="onSubmit">Save</el-button>
+          <el-button type="info" @click="back">Cancel</el-button>
         </el-form-item>
       </el-form>
       <div class="choose-avatar" v-if="chooseAvatarShow">
@@ -66,7 +66,7 @@
         <el-button
           style="position: relative; left: 50%; transform: translate(-50%, 50%)"
           @click="getSelectedImageId"
-          type="primary"
+          color="#FF914d"
           round
           size="large"
           >Choose this!</el-button
@@ -125,15 +125,6 @@ onMounted(() => {
 });
 
 const onSubmit = () => {
-  console.log({
-    name: form.name,
-    birthday: form.birthday,
-    introduction: form.introduction,
-    gender: form.gender,
-    phoneNumber: form.phoneNumber,
-    avatar: form.avatar,
-    id: userID,
-  });
   postJson(
     "/api/user/me",
     {
@@ -179,6 +170,11 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
   position: relative;
   top: -3%;
 
+  .el-form-item__label{
+    color: #ebebeb;
+  }
+
+
   .form {
     margin-right: 15%;
     margin-left: 4%;
@@ -223,7 +219,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
       width: 30%;
 
       &:hover {
-        color: #44849f;
+        color: #FF914d;
         text-decoration: underline;
         cursor: pointer;
       }
@@ -239,7 +235,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
     position: absolute;
     top: 3%;
     height: 100vh;
-    background-color: #f7f7f7;
+    background-color: #305a92;
 
     .avatar-container {
       padding-top: 15%;
@@ -262,7 +258,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
       }
 
       .selected {
-        border: 2px solid blue;
+        border: 2px solid #FF914d;
         width: 147px;
         height: 146px;
       }

@@ -5,6 +5,7 @@ import { ElMessage } from "element-plus";
 import { post, get } from "@/net/axios";
 import router from "@/router";
 import { useStore } from "vuex";
+import "../../utils/color.scss";
 
 onMounted(() => {
   if (document.cookie) {
@@ -46,7 +47,6 @@ const login = () => {
     (message) => {
       ElMessage.success(message);
       get("/api/user/me", (message) => {
-        console.log(message);
         userInfo = {
           name: message.name,
           birthday: message.birthday,
@@ -72,11 +72,32 @@ const login = () => {
 </script>
 
 <template>
-  <div style="text-align: center; margin: 0 20px; position: relative; top: -5vh">
-    <img src="../../assets/logo/ucdlogo.png" alt="ucd" style="width: 100px; padding-bottom: 20px" />
-    <div style="font-size: 25px; font-weight: bold">Sign In</div>
-    <div style="font-size: 14px; color: grey">Please use a username or email to sign in</div>
-
+  <div
+    style="
+      text-align: center;
+      margin: 0 30px;
+      position: relative;
+      top: -5vh;
+      background-color: #305a92;
+    "
+  >
+  <div style="margin-top: -20px;">
+      <img
+        src="../../assets/logo/logo_icon.png"
+        alt="ucd"
+        style="width: 40px; padding-bottom: 10px"
+      />&nbsp
+      <img
+        src="../../assets/logo/logo_text.png"
+        alt="ucd"
+        style="width: 130px; padding-bottom: 20px"
+      />
+    </div>
+    <hr style="margin-bottom: 20px;" />
+    <div style="font-size: 25px; font-weight: bold; color: #ff914d">Sign In</div>
+    <div style="font-size: 14px; color: rgb(244, 244, 244)">
+      Please use a username or email to sign in
+    </div>
     <div style="margin-top: 50px">
       <el-input v-model="form.username" type="text" placeholder="Username/Email">
         <template #prefix>
@@ -100,24 +121,50 @@ const login = () => {
     </div>
     <el-row style="margin-top: 5px">
       <el-col :span="12" style="text-align: left">
-        <el-checkbox v-model="form.remember" label="Rememver Me" />
+        <el-checkbox style="color: #e4e4e4" v-model="form.remember" label="Remember Me" />
       </el-col>
       <el-col :span="12" style="text-align: right">
-        <el-link @click.stop="router.push('/forget')">Forgot Password?</el-link>
+        <el-link @click.stop="router.push('/forget')" type="info" style="color: rgb(244, 244, 244)"
+          >Forgot Password?</el-link
+        >
       </el-col>
     </el-row>
     <div style="margin-top: 40px">
-      <el-button @click="login" style="width: 270px" type="success" plain>Sign In</el-button>
+      <el-button
+        @click="login"
+        style="width: 270px; box-shadow: 0 0 3px rgba(255, 255, 255, 0.5)"
+        color="#0b4795"
+        plain
+        >Sign In</el-button
+      >
     </div>
     <el-divider>
-      <span style="color: grey; font-size: 13px">No Account</span>
+      <span style="background-color: #305a92; color: rgb(255, 255, 255); font-size: 13px"
+        >No Account</span
+      >
     </el-divider>
     <div>
-      <el-button style="width: 270px" @click.stop="router.push('/register')" type="warning" plain
+      <el-button
+        style="width: 270px; box-shadow: 0 0 3px rgba(255, 255, 255, 0.5)"
+        @click.stop="router.push('/register')"
+        color="#FF914d"
+        plain
         >Sign Up</el-button
       >
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss">
+@import "../../utils/color.scss";
+
+.el-divider__text {
+  background-color: $navy;
+}
+.el-input__wrapper {
+  background-color: rgb(244, 244, 244);
+}
+.el-input__inner {
+  background-color: rgb(244, 244, 244);
+}
+</style>

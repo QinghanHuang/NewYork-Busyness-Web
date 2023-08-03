@@ -36,7 +36,7 @@ const imgSrcCur = ref("");
 const tempCur = ref("");
 const dateCur = ref("");
 const desCur = ref("");
-const columns = ref(null);
+const columns = ref(null);``
 const imgSrcFur = ref("");
 
 onMounted(async () => {

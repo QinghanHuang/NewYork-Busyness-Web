@@ -1,6 +1,6 @@
 <template>
   <div :style="widthStyle">
-    <el-scrollbar>
+    <el-scrollbar ref="scrollbarRef" :native="false" class="custom-scrollbar" :noresize="true">
       <div class="scrollbar-flex-content">
         <el-image
           v-for="url in urls"
@@ -11,31 +11,41 @@
         />
       </div>
     </el-scrollbar>
-    <hr />
-    <div style="margin-left: 20px">
+    <div style="margin-left: 20px; color: #e4e4e4; margin-top: -15px">
       <h1>{{ locationName }}</h1>
     </div>
-    <div class="open-time" style="margin-left: 20px; color: #00989a">{{ openTimeText }}</div>
-    <div style="margin-left: 20px; display: flex; flex-direction: row">
-      <div style="position: relative; top: 6px; color: rgb(123, 123, 123)">
-        busy situation:&nbsp&nbsp
+    <div class="open-time" style="margin-top: -20px; margin-left: 20px; color: #00b2b5">
+      {{ openTimeText }}
+      <div :style="funcBtnStyle">
+        <el-tooltip effect="dark" content="add to itinerary">
+          <el-button type="warning" :icon="Star" circle size="small" @click="addItinerary"
+        /></el-tooltip>
       </div>
+    </div>
+    <div style="margin-left: 20px; display: flex; flex-direction: row">
+      <div style="position: relative; top: 6px; color: #ff914d; font-size: 20px">
+        Current Busy Level :
+      </div>
+      &nbsp&nbsp
       <el-rate
+        size="large"
         v-model="value"
         :icons="icons"
         :disabled-void-icon="Minus"
         show-score
         score-template="{value}"
         disabled
-        :colors="['#409eff', '#FF9900', 'red']"
+        :colors="['#00c763', '#FF9900', '#dc4d4d']"
       />
     </div>
     <hr />
     <div
       class="introduction"
-      style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 18px"
+      style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 17px"
     >
-      <p style="color: rgb(87, 87, 87)">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{ locationDes }}</p>
+      <p style="color: rgb(232, 232, 232); margin-top: 15px">
+        {{ locationDes }}
+      </p>
     </div>
     <div v-if="!isSmall" @click="clear()" class="close">------click Here to close------</div>
   </div>
@@ -44,16 +54,23 @@
 <script setup>
 import { post, get } from "@/net/axios";
 import { ref, defineProps, watchEffect, onMounted, computed } from "vue";
-import { SuccessFilled, WarningFilled, CircleCloseFilled, Minus } from "@element-plus/icons-vue";
+import {
+  SuccessFilled,
+  WarningFilled,
+  CircleCloseFilled,
+  Minus,
+  BellFilled,
+  Star,
+} from "@element-plus/icons-vue";
 import { useStore } from "vuex";
 
 let data;
+const store = useStore();
 const locationName = ref("");
 const locationID = computed(() => store.state.locationID);
 const locationDes = ref("");
 const value = ref();
 const urls = ref([]);
-const store = useStore();
 const icons = [SuccessFilled, WarningFilled, CircleCloseFilled];
 const props = defineProps({
   isSmall: {
@@ -62,23 +79,30 @@ const props = defineProps({
   },
 });
 const openTimeText = ref("");
-const widthStyle = ref({});
-const imgStyle = ref({});
+const scrollbarRef = ref(null);
 
-// get time
-const acquireTime = () => {
-  // Get the current date and time
-  const today = new Date();
+const addItinerary = () => {
+  const predictData = store.state.predictData;
+  const itineraryData = store.state.itinerary;
+  const lastItinerary = itineraryData[itineraryData.length - 1];
 
-  // Extract the year, month, day, and hour
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based, so we add 1
-  const day = String(today.getDate()).padStart(2, "0");
-  const hours = String(today.getHours()).padStart(2, "0");
+  lastItinerary.showSelection = true;
+  lastItinerary.selectedLocation = locationName.value;
+  lastItinerary.selectedDate = predictData[0].time.slice(0, 10);
+  lastItinerary.selectedTime = predictData[0].time.slice(11, 13) + ":00";
+  lastItinerary.busyLevel = value.value;
 
-  // Format the date and time as "YYYY-MM-DD-HH"
-  const formattedDateTime = `${year}-${month}-${day}-${hours}`;
-  return formattedDateTime;
+  itineraryData.push({
+    id: lastItinerary.id + 1,
+    showSelection: false,
+    selectedLocation: null,
+    selectedDate: null,
+    selectedTime: null,
+    busyLevel: 0,
+  });
+
+  store.commit("setItinerary", itineraryData);
+  store.commit("setSideBarShow", true);
 };
 
 const isOpen = (openTime, closeTime) => {
@@ -99,44 +123,39 @@ const isOpen = (openTime, closeTime) => {
   return currentTimeM >= openTimeM && currentTimeM <= closeTimeM;
 };
 
-const getBusyByTimeAndPid = (data, time, pid) => {
-  console.log(data, time, pid)
-  const dataByTime = {};
-  for (const key in data) {
-    const item = data[key];
-    if (!dataByTime[item.time]) {
-      dataByTime[item.time] = {};
-    }
-    dataByTime[item.time][item.pid] = item.busy;
-  }
-
-  if (dataByTime[time] && dataByTime[time][pid] !== undefined) {
-    return dataByTime[time][pid];
-  } else {
-    return null;
-  }
+const getTargetInfo = (ID) => {
+  const predictData = computed(() => store.state.predictData).value;
+  const item = predictData.find((obj) => obj.pid === ID);
+  store.commit("setTargetInfo", item);
+  return item;
 };
+
+const widthStyle = ref({});
+const imgStyle = ref({});
+const funcBtnStyle = ref({});
 
 watchEffect(() => {
   widthStyle.value = {
-    backgroundColor: "white",
+    backgroundColor: "#305a92",
     width: props.isSmall ? "100vw" : "500px",
   };
   imgStyle.value = {
     height: props.isSmall ? "170px" : "",
   };
-
+  funcBtnStyle.value = {
+    position: "absolute",
+    right: "20px",
+    marginTop: "-15px",
+  };
   const ID = locationID.value;
-  console.log(ID);
   const url = `/api/poi/${ID}`;
   get(url, (res) => {
     data = res;
     locationName.value = data.name;
     locationDes.value = data.introduction;
-    const poiData = computed(() => store.state.poiData).value;
-    value.value = getBusyByTimeAndPid(poiData, acquireTime(), ID);
+    const busy = getTargetInfo(ID).busy;
+    value.value = busy;
     urls.value = data.img;
-    console.log(isOpen(data.openTime.open, data.openTime.close));
     openTimeText.value = isOpen(data.openTime.open, data.openTime.close)
       ? `OPEN NOW (${data.openTime.open} - ${data.openTime.close})`
       : `CLOSED (${data.openTime.open} - ${data.openTime.close})`;
@@ -144,11 +163,14 @@ watchEffect(() => {
 });
 
 const clear = () => store.commit("setInfoWindowShow", false);
+
+onMounted(() => {});
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .scrollbar-flex-content {
   display: flex;
+  min-width: 200%;
   .inline-image {
     flex-shrink: 0;
     display: flex;
@@ -166,13 +188,18 @@ const clear = () => store.commit("setInfoWindowShow", false);
 .close {
   position: absolute;
   bottom: 2%;
-  color: rgb(172, 172, 172);
+  color: #ff914d;
   text-align: center;
   width: 100%;
 
   &:hover {
     color: #00989a;
     cursor: pointer;
+    // background-color: rgb(38, 52, 67),
   }
+}
+
+.el-rate__text {
+  color: #ff914d;
 }
 </style>

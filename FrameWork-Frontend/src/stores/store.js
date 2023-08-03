@@ -21,6 +21,18 @@ let poiObj = [
 let zoneObj = [{}];
 let poiDataObj = [{}];
 let zoneDataObj = [{}];
+let itineraryObj = [
+  {
+    id: 1,
+    showSelection: false,
+    selectedLocation: null,
+    selectedDate: null,
+    selectedTime: null,
+    busyLevel: 0,
+  },
+];
+let predictDataObj = [];
+let targetInfoObj =[]
 
 const store = createStore({
   state() {
@@ -33,10 +45,12 @@ const store = createStore({
       poiInfo: poiObj,
       zoneInfo: zoneObj,
       locationID: "",
-      poiList: [],
       poiData: poiDataObj,
       zoneData: zoneDataObj,
       busy: 1,
+      itinerary: itineraryObj,
+      predictData: predictDataObj,
+      targetInfo: targetInfoObj
     };
   },
   mutations: {
@@ -64,9 +78,6 @@ const store = createStore({
     setAuth(state, value) {
       state.auth = value;
     },
-    setPoiList(state, obj) {
-      state.poiList = obj;
-    },
     setPoiData(state, obj) {
       state.poiData = obj;
     },
@@ -76,6 +87,15 @@ const store = createStore({
     setBusy(state, obj) {
       state.busy = obj;
     },
+    setItinerary(state, obj) {
+      state.itinerary = obj;
+    },
+    setPredictData(state, obj){
+      state.predictData = obj
+    },
+    setTargetInfo( state, obj){
+      state.targetInfo = obj
+    }
   },
   actions: {
     updateUserName({ commit }, value) {

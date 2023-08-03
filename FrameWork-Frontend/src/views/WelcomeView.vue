@@ -63,6 +63,8 @@ const searchAreaStyle = ref({});
 const sliderStyle = ref({});
 const weatherWindowTrigger = ref(null);
 const weatherWindowPlacement = ref(null);
+const openSideBarButtonStyle = ref({});
+const titleBarStyle = ref({});
 const colorDict = {
   1: "green",
   2: "blue",
@@ -70,15 +72,30 @@ const colorDict = {
   4: "orange",
   5: "red",
 };
+const iconDict = {
+  1: "../src/assets/icon_svg/1.svg",
+  2: "../src/assets/icon_svg/2.svg",
+  3: "../src/assets/icon_svg/3.svg",
+  4: "../src/assets/icon_svg/4.svg",
+  5: "../src/assets/icon_svg/5.svg",
+};
 
 watchEffect(() => {
   const isSmall = isSmallScreen.value;
   weatherWindowTrigger.value = isSmall ? "click" : "hover";
   weatherWindowPlacement.value = isSmall ? "right" : "right";
-
+  titleBarStyle.value = {
+    width: isSmall ? "" : "200px",
+    right: "0px",
+  };
+  openSideBarButtonStyle.value = {
+    top: isSmall ? "10px" : "",
+    boxShadow: isSmall ? "0 0 0 0" : "",
+    transform: isSmall ? "scale(1.45)" : "",
+  };
   searchAreaStyle.value = {
     left: infoWindowShow.value ? (isSmall ? "" : "-20%") : "",
-    top: isSmall ? "2%" : "2.5%",
+    top: isSmall ? "0" : "2.5%",
     transition: "left width 0.5s ease",
   };
   mapChooseStyle.value = {
@@ -123,13 +140,14 @@ watchEffect(() => {
     boxShadow: "0 0 5px rgba(0, 0, 0, 01)",
   };
   containerStyle.value = {
-    backgroundColor: "white",
+    backgroundColor: "#305a92",
     height: "100%",
     zIndex: 1,
     width: isSmall ? "330px" : "500px",
   };
   inputStyle.value = {
     position: "relative",
+    top: isSmall ? "70px" : "",
     left: isSmall ? "8%" : "",
     width: isSmall ? "75vw" : infoWindowShow.value ? "300px" : "400px",
   };
@@ -159,7 +177,6 @@ const showLoader = () => {
 // ----------------------time relative----------------------
 // get time
 const acquireTime = () => {
-  // Get the current date and time
   const today = new Date();
 
   // Extract the year, month, day, and hour
@@ -172,6 +189,7 @@ const acquireTime = () => {
   const formattedDateTime = `${year}-${month}-${day}-${hours}`;
   return formattedDateTime;
 };
+
 // slider time formatter
 const formatTooltip = (val) => {
   return `${val}:00`;
@@ -181,7 +199,7 @@ const formatTooltip = (val) => {
 const sliderTimeShow = ref({});
 const timePoints = [0, 6, 12, 18, 23];
 const commonStyle = {
-  color: "#1989FA",
+  color: "#305a92",
   fontSize: "10px",
 };
 
@@ -254,9 +272,7 @@ const handleDateSelect = async (date) => {
 
 const search = () => {
   if (isLoginFail()) return;
-
   clear();
-
   geocode({
     address: searchTerm.value.includes(",")
       ? searchTerm.value.match(/^[^,]+/)?.[0]
@@ -276,11 +292,10 @@ const getIdByName = (name) => {
   return foundItem ? foundItem.id : null;
 };
 
+// useless
 const geocode = (request) => {
   if (!request.address) return;
-
   clear();
-
   geocoder
     .geocode(request)
     .then((result) => {
@@ -304,34 +319,31 @@ const geocode = (request) => {
 };
 
 // ----------------------login auth fail----------------------
+
 const isLoginFail = () => {
   if (!computed(() => store.state.auth).value) {
     ElMessage.warning("login to use this function");
+    openSideBar();
     return true;
   }
+
   return false;
 };
-
+const throttledIsLoginFail = throttle(isLoginFail, 200);
 // ----------------------slider function----------------------
 const sliderTimeChange = () => {
+  if (throttledIsLoginFail()) return;
   const targetTime =
     forecastTime.value < 10
       ? `${todayDate.value}-0${forecastTime.value}`
       : `${todayDate.value}-${forecastTime.value}`;
   const tempData = computed(() => store.state.poiData).value;
   const filteredData = tempData.filter((data) => data.time === targetTime);
-
+  store.commit("setPredictData", filteredData);
   markerList.forEach((marker, index) => {
-    const busyLevel = filteredData[index].busy;
-    const color = colorDict[busyLevel];
     const newIcon = {
-      path: "M 0 12 C 5 12 5 4 0 4 C -5 4 -5 12 0 12 z M 0 0 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039 z",
-      fillColor: color,
-      fillOpacity: 1,
-      strokeWeight: 1,
-      rotation: 0,
-      scale: 2,
-      anchor: new google.maps.Point(0, 20),
+      url: iconDict[filteredData[index].busy],
+      scaledSize: new google.maps.Size(30, 30),
     };
     marker.setIcon(newIcon);
   });
@@ -357,14 +369,18 @@ const setMarkers = async (currTime, todayDate) => {
 
   // loader
   const loading = showLoader();
-  
+
   // get data
   await get(`/api/prediction/poi/${todayDate.value}`, (message) => {
     dataList = message;
     store.commit("setPoiData", dataList);
   });
 
-  loading.close()
+  // set data to predictData
+  const filteredData = dataList.filter((data) => data.time === currTime);
+  store.commit("setPredictData", filteredData);
+
+  loading.close();
 
   const adviseDict = {
     1: "Enjoy the tranquility and serenity.",
@@ -381,19 +397,15 @@ const setMarkers = async (currTime, todayDate) => {
     const ID = data.pid;
     const busyLevel = data.busy;
     const color = colorDict[busyLevel];
+
     const customMarker = new window.google.maps.Marker({
       position: locationInfo[ID - 1].location,
       animation: google.maps.Animation.DROP,
       title: locationInfo[ID - 1].name,
       map,
       icon: {
-        path: "M 0 12 C 5 12 5 4 0 4 C -5 4 -5 12 0 12 z M 0 0 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039 z",
-        fillColor: color,
-        fillOpacity: 1,
-        strokeWeight: 1,
-        rotation: 0,
-        scale: 2,
-        anchor: new google.maps.Point(0, 20),
+        url: iconDict[data.busy],
+        scaledSize: new google.maps.Size(30, 30),
       },
     });
 
@@ -406,17 +418,19 @@ const setMarkers = async (currTime, todayDate) => {
     });
 
     // click info window
-    const contentString = `<div style="position: relative; top: -15px; width:200px;height:90px;">
-    <h3>${locationInfo[ID - 1].name}</h3>
-
-        <p>${adviseDict[data.busy]}</p></div>
-
+    const contentString = `
+    <div style="position: relative; top: -15px; width:200px;height:110px;">
+      <h3>${locationInfo[ID - 1].name}</h3>
+      <p>${adviseDict[data.busy]}</p>
+    </div>
     `;
+
     customMarker.addListener("click", () => {
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
 
       map.panTo(locationInfo[ID - 1].location);
+      store.commit("setBusy", data.busy);
       showLocInfo(ID);
     });
 
@@ -452,7 +466,7 @@ const setHeatMap = async (currTime, todayDate) => {
   });
 
   heatMapObj.setOptions({
-    // gradient: ["rgba(0, 255, 0, 0)", "rgba(255, 0, 0, 1)"],
+    gradient: ["rgba(48, 90, 146, 0.5)", "yellow", "#fd7a28"],
     maxIntensity: 5,
     minIntensity: 1,
   });
@@ -489,6 +503,9 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 
 // show heatmap
 const showHeatmap = () => {
+  if (isSmallScreen.value) store.commit("setInfoWindowShow", false);
+  map.panTo({ lat: 40.74039, lng: -73.99937 });
+  map.setZoom(13);
   heatMapObj.setMap(map);
   isHeatmap = true;
 };
@@ -555,10 +572,16 @@ watchEffect(async () => {
   }
 });
 
+watchEffect(() => {
+  // watch opensidebarshow
+  const isOpenSideBar = computed(() => store.state.sideBarShow).value;
+  if (isOpenSideBar) showOverlay.value = true;
+});
+
 // life circle functions
 onMounted(() => {
   // test
-  get("/api/weather/forecast", (res) => console.log("/api/weather/forecast", res));
+  // get("/api/weather/forecast", (res) => console.log("/api/weather/forecast", res));
 
   // adjust side bar size
   handleWindowResize();
@@ -657,6 +680,16 @@ onUnmounted(() => {
     <div class="map-view">
       <!-- map -->
       <div id="map" style="width: 100vw; height: 100vh"></div>
+      <!-- title bar -->
+      <div class="title-bar" :style="titleBarStyle">
+        <img
+          src="../assets/logo/logo_icon.png"
+          alt="logo_icon"
+          style="width: 20px; margin-right: 10px"
+        />
+        <img src="../assets/logo/logo_text.png" alt="logo_icon" style="width: 110px" />
+      </div>
+
       <!-- search area -->
       <div class="search-area" :style="searchAreaStyle">
         <el-input
@@ -666,10 +699,9 @@ onUnmounted(() => {
           placeholder="Search location"
           class="search-input"
           size="large"
+          :suffix-icon="Search"
         >
-          <template #append>
-            <el-button style="width: 70px" :icon="Search" @click="search" /></template
-        ></el-input>
+        </el-input>
       </div>
 
       <!-- switch map type -->
@@ -684,12 +716,12 @@ onUnmounted(() => {
             size="large"
             style="
               margin-right: 20px;
-              --el-switch-on-color: #003c55;
-              --el-switch-off-color: #d11e3b;
+              --el-switch-on-color: #305a92;
+              --el-switch-off-color: #ff914d;
             "
             active-value="HEATMAP"
             inactive-value="MARKERS"
-            active-text="&nbsp&nbsp&nbsp MAEKERS &nbsp&nbsp&nbsp  "
+            active-text="&nbsp&nbsp&nbsp MARKERS &nbsp&nbsp&nbsp  "
             inactive-text=" &nbsp&nbsp&nbsp  HEATMAP  &nbsp&nbsp&nbsp "
             @change="mapStyleChange"
         /></el-tooltip>
@@ -697,8 +729,10 @@ onUnmounted(() => {
 
       <!-- busy level forecast slider -->
       <div style="position: absolute" :style="sliderStyle">
-        <el-dropdown style="position: absolute; top: 5px; font-size: 15px; left: 10px">
-          {{ todayDate }}
+        <el-dropdown
+          style="color: black; position: absolute; top: 9px; font-size: 17px; left: 10px"
+        >
+          {{ todayDate.slice(5) }}
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item
@@ -723,9 +757,10 @@ onUnmounted(() => {
       <!-- open side bar button -->
       <div ref="openSideBarRef">
         <el-button
-          type="warning"
+          color="#305a92"
           :icon="Expand"
           class="open-side-bar-button"
+          :style="openSideBarButtonStyle"
           @click="openSideBar"
           size="large"
         ></el-button>
@@ -734,8 +769,8 @@ onUnmounted(() => {
       <!-- zoom in/out button -->
       <div class="zoom" :style="zoomStyle">
         <el-button v-show="false"></el-button>
-        <el-button type="success" :icon="Plus" @click="zoomIn" circle></el-button>
-        <el-button type="success" :icon="Minus" @click="zoomOut" circle></el-button>
+        <el-button color="#305a92" :icon="Plus" @click="zoomIn" circle></el-button>
+        <el-button color="#305a92" :icon="Minus" @click="zoomOut" circle></el-button>
       </div>
 
       <!-- close info button -->
@@ -757,7 +792,7 @@ onUnmounted(() => {
           :trigger="weatherWindowTrigger"
           :placement="weatherWindowPlacement"
           :width="300"
-          popper-style="border-radius: 10px;margin-top:100px;background-color: rgb(14, 116, 226);box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+          popper-style="border-radius: 10px;margin-top:100px;background-color: #305a92;box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
         >
           <template #reference>
             <div class="current-weather" @click="open">
@@ -773,12 +808,13 @@ onUnmounted(() => {
         </el-popover>
       </div>
     </div>
-    <!-- <div v-show="false" class="overlay-map"></div> -->
+
+    <!-- mask -->
     <div v-show="showOverlay" class="overlay-map" ref="overlayRef"></div>
-    <!-- side bar position: absolute-->
+
+    <!-- side bar -->
     <div class="side-bar" ref="sideBarRef" @click="outsideClickFold">
       <transition name="slide-in-right">
-        <!-- <div v-if="false" :style="containerStyle"> -->
         <div v-if="sideBarShow" :style="containerStyle">
           <!-- close button -->
           <el-button
@@ -791,11 +827,12 @@ onUnmounted(() => {
           />
           <!-- sign-register component -->
           <router-view v-slot="{ Component }">
-            <component :is="Component" class="sign-register" />
+            <component :is="Component" class="sign-register" :isSmall="isSmallScreen" />
           </router-view>
         </div>
       </transition>
     </div>
+
     <!-- info window -->
     <transition name="slide-in-left">
       <div v-if="infoWindowShow" class="info-style">
@@ -808,6 +845,7 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss">
+@import "../utils/color.scss";
 .main-view {
   width: 100vw;
   height: 100vh;
@@ -851,6 +889,18 @@ onUnmounted(() => {
       left: 10px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
       z-index: 2;
+    }
+    .title-bar {
+      background-color: $navy;
+      position: fixed;
+      box-shadow: 0 0 3px rgba(0, 0, 0, 1);
+      top: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 60px;
     }
     .search-area {
       position: absolute;
@@ -899,7 +949,7 @@ onUnmounted(() => {
         justify-content: center;
         border-radius: 5px;
         box-shadow: 0 0 5px rgba(0, 0, 0, 1);
-        background-color: rgb(14, 116, 226);
+        background-color: $navy;
 
         &::before {
           content: "";
@@ -925,10 +975,10 @@ onUnmounted(() => {
     }
 
     .el-slider__bar {
-      background-color: #000000;
+      background-color: $navy;
     }
     .el-slider__runway {
-      background-color: red;
+      background-color: $orange;
     }
   }
   .overlay-map {
@@ -962,13 +1012,13 @@ onUnmounted(() => {
 
   .infoWindow {
     position: absolute;
-    background-color: rgb(255, 255, 255);
+    background-color: $navy;
     right: 0%;
     top: 0%;
   }
 
   .info-style {
-    background-color: rgb(255, 255, 255);
+    background-color: #305a92;
     position: absolute;
     width: 500px;
     height: 100vh;
