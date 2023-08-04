@@ -9,7 +9,7 @@ import "../../utils/color.scss";
 
 onMounted(() => {
   if (document.cookie) {
-    const userName = document.cookie.match(/[^=\s]+=[^;]+/)[0].split("=")[1];
+    const userName = (document.cookie.match(/(?<=username=)[^;]+/) || [])[0] || "";
     form.username = userName;
     form.remember = true;
   }
@@ -81,7 +81,7 @@ const login = () => {
       background-color: #305a92;
     "
   >
-  <div style="margin-top: -20px;">
+    <div style="margin-top: -20px">
       <img
         src="../../assets/logo/logo_icon.png"
         alt="ucd"
@@ -93,12 +93,12 @@ const login = () => {
         style="width: 130px; padding-bottom: 20px"
       />
     </div>
-    <hr style="margin-bottom: 20px;" />
-    <div style="font-size: 25px; font-weight: bold; color: #ff914d">Sign In</div>
+    <hr style="margin-bottom: 20px" />
+    <div style="font-size: 35px; font-weight: bold; color: #ff914d">Sign In</div>
     <div style="font-size: 14px; color: rgb(244, 244, 244)">
       Please use a username or email to sign in
     </div>
-    <div style="margin-top: 50px">
+    <div style="margin-top: 30px" class="big-screen">
       <el-input v-model="form.username" type="text" placeholder="Username/Email">
         <template #prefix>
           <el-icon>
@@ -119,7 +119,7 @@ const login = () => {
         </template>
       </el-input>
     </div>
-    <el-row style="margin-top: 5px">
+    <el-row style="margin-top: 5px" class="big-screen">
       <el-col :span="12" style="text-align: left">
         <el-checkbox style="color: #e4e4e4" v-model="form.remember" label="Remember Me" />
       </el-col>
@@ -138,11 +138,11 @@ const login = () => {
         >Sign In</el-button
       >
     </div>
-    <el-divider>
-      <span style="background-color: #305a92; color: rgb(255, 255, 255); font-size: 13px"
-        >No Account</span
-      >
-    </el-divider>
+
+    <div style="background-color: #305a92; color: rgb(235, 235, 235); font-size: 13px;margin: 15px 0px;width: 100%;"
+      >——————————— No Account ———————————</div
+    >
+
     <div>
       <el-button
         style="width: 270px; box-shadow: 0 0 3px rgba(255, 255, 255, 0.5)"
@@ -157,9 +157,15 @@ const login = () => {
 
 <style lang="scss">
 @import "../../utils/color.scss";
+.big-screen {
+  @media (min-width: 600px) {
+    width: 80%;
+    margin-left: 10%;
+  }
+}
 
 .el-divider__text {
-  background-color: $navy;
+  background-color: #305a92;
 }
 .el-input__wrapper {
   background-color: rgb(244, 244, 244);
