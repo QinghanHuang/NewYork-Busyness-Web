@@ -14,6 +14,7 @@ const store = useStore()
   <router-view/>
 </template>
 
-<style scoped>
+<style>
+
 
 </style>

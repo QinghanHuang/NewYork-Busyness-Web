@@ -6,6 +6,7 @@
           v-for="url in urls"
           :key="url"
           :src="url"
+          :preview-src-list="urls"
           class="inline-image"
           :style="imgStyle"
         />

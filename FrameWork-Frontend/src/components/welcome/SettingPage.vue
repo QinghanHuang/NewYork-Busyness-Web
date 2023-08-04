@@ -1,7 +1,7 @@
 <template>
   <div class="this">
     <div class="title" style="position: absolute; top: 1%; margin-left: 2%; color: #343434">
-      <h1 style="color: #FF914d;">Edit Profile</h1>
+      <h1 style="color: #ff914d">Edit Profile</h1>
     </div>
     <div style="margin-top: 5%">
       <div class="avatar">
@@ -15,7 +15,7 @@
       </div>
       <el-divider />
       <el-form :model="form" label-width="100px" class="form">
-        <el-form-item label="Email" >
+        <el-form-item label="Email">
           <el-input disabled v-model="form.email" class="add-shadow" />
         </el-form-item>
         <el-form-item label="User Name">
@@ -109,6 +109,9 @@ const selectedImageId = ref(null);
 const chooseAvatarShow = ref(false);
 
 onMounted(() => {
+  const screenHeight = window.innerHeight;
+  document.documentElement.style.setProperty("--screen-height", `${screenHeight}px`);
+
   get("/api/user/me", (message) => {
     form.name = message.name;
     form.birthday = message.birthday;
@@ -165,15 +168,18 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
 </script>
 
 <style lang="scss">
+:root {
+  --screen-height: 100vh;
+}
+
 .this {
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   position: relative;
   top: -3%;
 
-  .el-form-item__label{
+  .el-form-item__label {
     color: #ebebeb;
   }
-
 
   .form {
     margin-right: 15%;
@@ -219,7 +225,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
       width: 30%;
 
       &:hover {
-        color: #FF914d;
+        color: #ff914d;
         text-decoration: underline;
         cursor: pointer;
       }
@@ -234,7 +240,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
   .choose-avatar {
     position: absolute;
     top: 3%;
-    height: 100vh;
+    height: var(--screen-height);
     background-color: #305a92;
 
     .avatar-container {
@@ -258,7 +264,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
       }
 
       .selected {
-        border: 2px solid #FF914d;
+        border: 2px solid #ff914d;
         width: 147px;
         height: 146px;
       }

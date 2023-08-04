@@ -76,11 +76,11 @@ const colorDict = {
   5: "red",
 };
 const iconDict = {
-  1: "../src/assets/icon_svg/1.svg",
-  2: "../src/assets/icon_svg/2.svg",
-  3: "../src/assets/icon_svg/3.svg",
-  4: "../src/assets/icon_svg/4.svg",
-  5: "../src/assets/icon_svg/5.svg",
+  1: "../src/assets/icon_svg/1.png",
+  2: "../src/assets/icon_svg/2.png",
+  3: "../src/assets/icon_svg/3.png",
+  4: "../src/assets/icon_svg/4.png",
+  5: "../src/assets/icon_svg/5.png",
 };
 
 watchEffect(() => {
@@ -170,7 +170,7 @@ watchEffect(() => {
     width: isSmall ? "37vw" : "",
   };
   infoStyle.value = {
-    height: isSmall ? "40vh" : "100vh",
+    height: isSmall ? "40vh" : "var(--screen-height)",
     borderRadius: isSmall ? "5px" : "",
   };
 });
@@ -575,16 +575,20 @@ const outsideClickFold = (event) => {
   }
 };
 
-watchEffect(async () => {
-  // watch the login auth of user
-  const userAuth = computed(() => store.state.auth);
-  if (userAuth.value) {
-    setWeather();
+const showMarkerBegin = async ()=>{
+  setWeather();
     // store poi and taxi zone info
     await get("/api/poi/all", (res) => store.commit("setPoiInfo", res));
     await setMarkers(currTime, todayDate);
     setHeatMap(currTime, todayDate);
     setWeather();
+}
+
+watchEffect(async () => {
+  // watch the login auth of user
+  const userAuth = computed(() => store.state.auth);
+  if (userAuth.value) {
+    
   }
 });
 
@@ -681,6 +685,12 @@ onMounted(() => {
   currTime = acquireTime();
   forecastTime.value = +currTime.slice(11, 13);
   todayDate.value = currTime.slice(0, 10);
+
+  // accquire real height
+  const screenHeight = window.innerHeight;
+  document.documentElement.style.setProperty("--screen-height", `${screenHeight}px`);
+
+  showMarkerBegin()
 });
 
 onUnmounted(() => {
@@ -695,7 +705,7 @@ onUnmounted(() => {
     <!-- map view for map and map relative elements -->
     <div class="map-view">
       <!-- map -->
-      <div id="map" style="width: 100vw; height: 100vh"></div>
+      <div id="map" style="width: 100vw; height: var(--screen-height)"></div>
       <!-- title bar -->
       <div class="title-bar" :style="titleBarStyle" @click="moveHome">
         <img
@@ -865,9 +875,13 @@ onUnmounted(() => {
 
 <style lang="scss">
 @import "../utils/color.scss";
+:root {
+  --screen-height: 100vh;
+}
+
 .main-view {
   width: 100vw;
-  height: 100vh;
+  height: var(--screen-height);
   overflow: hidden;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 
@@ -905,7 +919,7 @@ onUnmounted(() => {
   }
 
   .map-view {
-    position: fixed;
+    position: absolute;
     width: 100%;
     overflow-x: hidden;
     .open-side-bar-button {
@@ -1006,6 +1020,23 @@ onUnmounted(() => {
     .el-slider__runway {
       background-color: $orange;
     }
+
+    .el-divider__text {
+      background-color: black;
+    }
+    .el-input__wrapper {
+      background-color: rgb(244, 244, 244);
+    }
+    .el-input__inner {
+      background-color: rgb(244, 244, 244);
+    }
+    .el-step__title.is-process {
+      color: #ff914d;
+    }
+    .el-step__head.is-process {
+      color: #ff914d;
+      border-color: #ff914d;
+    }
   }
   .overlay-map {
     position: fixed;
@@ -1019,7 +1050,7 @@ onUnmounted(() => {
   .side-bar {
     position: fixed;
     top: 0;
-    height: 100vh;
+    height: var(--screen-height);
     display: flex;
     justify-items: center;
     z-index: 10;
@@ -1047,7 +1078,7 @@ onUnmounted(() => {
     background-color: #305a92;
     position: absolute;
     width: 500px;
-    height: 100vh;
+    height: var(--screen-height);
     right: 0;
     top: 0;
     overflow-x: hidden;

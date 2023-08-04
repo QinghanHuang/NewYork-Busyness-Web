@@ -9,7 +9,7 @@ import "../../utils/color.scss";
 
 onMounted(() => {
   if (document.cookie) {
-    const userName = document.cookie.match(/[^=\s]+=[^;]+/)[0].split("=")[1];
+    const userName = (document.cookie.match(/(?<=username=)[^;]+/) || [])[0] || "";
     form.username = userName;
     form.remember = true;
   }
@@ -138,11 +138,11 @@ const login = () => {
         >Sign In</el-button
       >
     </div>
-    <el-divider>
-      <span style="background-color: #305a92; color: rgb(255, 255, 255); font-size: 13px"
-        >No Account</span
-      >
-    </el-divider>
+
+    <div style="background-color: #305a92; color: rgb(235, 235, 235); font-size: 13px;margin: 15px 0px;width: 100%;"
+      >——————————— No Account ———————————</div
+    >
+
     <div>
       <el-button
         style="width: 270px; box-shadow: 0 0 3px rgba(255, 255, 255, 0.5)"
@@ -165,7 +165,7 @@ const login = () => {
 }
 
 .el-divider__text {
-  background-color: $navy;
+  background-color: #305a92;
 }
 .el-input__wrapper {
   background-color: rgb(244, 244, 244);

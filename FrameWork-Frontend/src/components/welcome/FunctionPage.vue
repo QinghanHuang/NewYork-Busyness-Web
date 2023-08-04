@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <el-divider style="width: 95%" />
+    <el-divider style="width: 95%;position: absolute;" />
     <div
       style="
         color: #ff914d;
@@ -55,6 +55,8 @@
             <transition name="el-zoom-in-center">
               <div v-if="column.showSelection">
                 <el-date-picker
+                  :clearable="false"
+                  :editable="false"
                   size="small"
                   class="selection"
                   v-model="column.selectedDate"
@@ -64,6 +66,7 @@
                   value-format="YYYY-MM-DD"
                 />
                 <el-time-select
+                  :clearable="false"
                   :editable="false"
                   size="small"
                   class="selection"
@@ -79,6 +82,7 @@
                   :content="column.selectedLocation"
                 >
                   <el-select
+                    :clearable="false"
                     v-model="column.selectedLocation"
                     placeholder="Select a Location"
                     class="selection-location"
@@ -94,7 +98,7 @@
                 <span style="margin-left: 10px; color: #ff914d">Busy Level:</span>
                 <el-rate
                   v-model="column.busyLevel"
-                  size=large
+                  size="large"
                   :icons="icons"
                   show-score
                   score-template="{value}"
@@ -154,7 +158,7 @@ const columns = ref([
 ]);
 
 // const icons = [SuccessFilled, WarningFilled, CircleCloseFilled];
-const icons = [OfficeBuilding, OfficeBuilding, OfficeBuilding]
+const icons = [OfficeBuilding, OfficeBuilding, OfficeBuilding];
 let locations;
 
 const getIdByName = (name) => {
@@ -319,10 +323,11 @@ const toggleSelection = (column) => {
 }
 .func {
   overflow-x: hidden;
+  position:absolute;
 
   width: 94%;
   height: 60vh;
-  margin-top: 35px;
+  margin-top: 80px;
   border-radius: 5px;
   background-color: #305a92;
 
@@ -346,9 +351,8 @@ const toggleSelection = (column) => {
       width: 200px;
 
       @media (max-width: 600px) {
-        width: 125px
+        width: 125px;
       }
-  
     }
 
     .selection-location {
@@ -357,10 +361,9 @@ const toggleSelection = (column) => {
       border-radius: 4px;
       margin-top: 8px;
       width: 408px;
-      
 
       @media (max-width: 600px) {
-        width: 258px
+        width: 258px;
       }
     }
 
