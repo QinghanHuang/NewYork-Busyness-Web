@@ -47,9 +47,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/auth/**")
+                        //login
+                        .requestMatchers("/api/auth/**","/api/weather/**","/api/prediction/**","/api/poi/all")
                         .permitAll()
-                        .requestMatchers("/api/auth/**","/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**")
+                        //weather makers
+//                        .requestMatchers("/api/weather/**","api/prediction/**","api/poi/all")
+//                        .permitAll()
+                        //swagger
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
