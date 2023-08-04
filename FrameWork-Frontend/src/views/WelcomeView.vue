@@ -37,6 +37,8 @@ const mapStyleSwitch = ref("HEATMAP");
 const futureDates = ref([]);
 const forecastTime = ref(0);
 const todayDate = ref("");
+const directionsDisplay = new google.maps.DirectionsRenderer();
+const infoWindowList = [];
 
 let currTime;
 let weatherCurData;
@@ -90,14 +92,15 @@ watchEffect(() => {
   infoWindowCloseBtnStyle.value = {
     position: "absolute",
     right: isSmall ? "15px" : "500px",
-    top: isSmall ? "calc(60vh - 32px)" : "45%",
+    top: isSmall ? "calc(0.6 * var(--screen-height) - 32px)" : "45%",
   };
   titleBarStyle.value = {
-    width: isSmall ? "" : "200px",
+    width: isSmall ? "100vw" : "200px",
     marginTop: isSmall ? "" : "17px",
     marginRight: isSmall ? "" : "10px",
     borderRadius: isSmall ? "" : "5px",
     right: "0px",
+    height: "60px",
   };
   openSideBarButtonStyle.value = {
     top: isSmall ? "10px" : "",
@@ -120,7 +123,7 @@ watchEffect(() => {
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    bottom: isSmall ? (infoWindowShow.value ? "40vh" : "5px") : "20px",
+    bottom: isSmall ? (infoWindowShow.value ? "calc(0.4 * var(--screen-height))" : "5px") : "20px",
     left: isSmall ? "10px" : "10px",
   };
   sliderStyle.value = {
@@ -133,7 +136,11 @@ watchEffect(() => {
     paddingTop: "50px",
     paddingBottom: "20px",
     transition: "bottom  0.5s ease, height 0.5s ease",
-    bottom: isSmall ? (infoWindowShow.value ? "47vh" : "70px") : "80px",
+    bottom: isSmall
+      ? infoWindowShow.value
+        ? "calc(0.47 * var(--screen-height))"
+        : "70px"
+      : "80px",
     height: isSmall ? (infoWindowShow.value ? "200px" : "350px") : "350px",
     left: isSmall ? "10px" : "10px",
   };
@@ -170,13 +177,13 @@ watchEffect(() => {
     width: isSmall ? "37vw" : "",
   };
   infoStyle.value = {
-    height: isSmall ? "40vh" : "var(--screen-height)",
+    height: isSmall ? "calc(0.4 * var(--screen-height))" : "var(--screen-height)",
     borderRadius: isSmall ? "5px" : "",
   };
 });
 
 // **********************methods***********************
-// ----------------------loader----------------------
+// ----------------------loader------------------------
 const showLoader = () => {
   return ElLoading.service({
     lock: true,
@@ -235,7 +242,7 @@ const padNumber = (num) => {
 // generate Future Dates
 const generateFutureDates = () => {
   const today = new Date();
-  for (let i = 0; i <= 5; i++) {
+  for (let i = 0; i <= 10; i++) {
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + i);
     futureDates.value.push(formatDate(futureDate));
@@ -257,6 +264,8 @@ const setWeather = () => {
 // ----------------------map relative----------------------
 // move Map Center
 const moveHome = () => {
+  console.log(11111);
+  store.commit("setInfoWindowShow", false);
   clear();
   map.panTo({ lat: 40.74039, lng: -73.99937 });
   map.setZoom(13);
@@ -575,20 +584,20 @@ const outsideClickFold = (event) => {
   }
 };
 
-const showMarkerBegin = async ()=>{
+const showMarkerBegin = async () => {
   setWeather();
-    // store poi and taxi zone info
-    await get("/api/poi/all", (res) => store.commit("setPoiInfo", res));
-    await setMarkers(currTime, todayDate);
-    setHeatMap(currTime, todayDate);
-    setWeather();
-}
+  // store poi and taxi zone info
+  await get("/api/poi/all", (res) => store.commit("setPoiInfo", res));
+  await setMarkers(currTime, todayDate);
+  setHeatMap(currTime, todayDate);
+  setWeather();
+};
 
 watchEffect(async () => {
   // watch the login auth of user
   const userAuth = computed(() => store.state.auth);
   if (userAuth.value) {
-    
+    showMarkerBegin();
   }
 });
 
@@ -690,7 +699,7 @@ onMounted(() => {
   const screenHeight = window.innerHeight;
   document.documentElement.style.setProperty("--screen-height", `${screenHeight}px`);
 
-  showMarkerBegin()
+  // showMarkerBegin()
 });
 
 onUnmounted(() => {
@@ -706,16 +715,6 @@ onUnmounted(() => {
     <div class="map-view">
       <!-- map -->
       <div id="map" style="width: 100vw; height: var(--screen-height)"></div>
-      <!-- title bar -->
-      <div class="title-bar" :style="titleBarStyle" @click="moveHome">
-        <img
-          src="../assets/logo/logo_icon.png"
-          alt="logo_icon"
-          style="width: 20px; margin-right: 10px"
-          @click="moveHome"
-        />
-        <img src="../assets/logo/logo_text.png" alt="logo_icon" style="width: 110px" />
-      </div>
 
       <!-- search area -->
       <div class="search-area" :style="searchAreaStyle">
@@ -729,6 +728,16 @@ onUnmounted(() => {
           :suffix-icon="Search"
         >
         </el-input>
+      </div>
+
+      <!-- title bar -->
+      <div class="title-bar" :style="titleBarStyle" @click="moveHome">
+        <img
+          src="../assets/logo/logo_icon.png"
+          alt="logo_icon"
+          style="width: 20px; margin-right: 10px"
+        />
+        <img src="../assets/logo/logo_text.png" alt="logo_icon" style="width: 110px" />
       </div>
 
       <!-- switch map type -->
@@ -866,7 +875,12 @@ onUnmounted(() => {
     <transition name="slide-in-left">
       <div v-if="infoWindowShow" class="info-style">
         <div class="infoWindow" :style="infoStyle">
-          <InfoPage :isSmall="isSmallScreen"></InfoPage>
+          <InfoPage
+            :isSmall="isSmallScreen"
+            :map="map"
+            :directionsDisplay="directionsDisplay"
+            :infoWindowList="infoWindowList"
+          ></InfoPage>
         </div>
       </div>
     </transition>
@@ -919,7 +933,7 @@ onUnmounted(() => {
   }
 
   .map-view {
-    position: absolute;
+    position: fixed;
     width: 100%;
     overflow-x: hidden;
     .open-side-bar-button {
@@ -939,12 +953,9 @@ onUnmounted(() => {
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      width: 100vw;
-      height: 60px;
     }
     .search-area {
       position: absolute;
-      z-index: 1;
       display: flex;
       justify-content: center;
       width: 100vw;
@@ -1088,7 +1099,7 @@ onUnmounted(() => {
     @media (max-width: 600px) {
       top: 60%;
       width: 100vw;
-      height: 75vh;
+      height: calc(0.75 * var(--screen-height));
     }
   }
 }

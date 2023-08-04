@@ -32,7 +32,7 @@
         color: #ff914d;
         position: absolute;
         left: 10px;
-        top: 97px;
+        top: 92px;
         display: flex;
         flex-direction: row;
       "
@@ -100,7 +100,6 @@
                   v-model="column.busyLevel"
                   size="large"
                   :icons="icons"
-                  show-score
                   score-template="{value}"
                   disabled
                   disabled-void-color="#305a92"

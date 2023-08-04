@@ -246,7 +246,7 @@ const chooseAvatar = () => (chooseAvatarShow.value = true);
     .avatar-container {
       padding-top: 15%;
       width: 100%;
-      height: 80vh;
+      height: calc(0.8 * var(--screen-height));
       overflow: hidden;
       display: flex;
       flex-wrap: wrap;
