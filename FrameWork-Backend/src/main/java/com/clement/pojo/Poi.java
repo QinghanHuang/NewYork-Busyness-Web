@@ -7,6 +7,7 @@ public class Poi{
     private int id;
     private String name;
     private Location location;
+    private String photo;
 
     @Data
     public static class Location{
