@@ -7,7 +7,7 @@
       font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     "
   >
-    <div>
+    <div @click="setting">
       <div style="position: absolute; left: 15px; top: 10px; border-radius: 5px; padding: 5px">
         <img
           src="../../assets/logo/logo_icon.png"
@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <el-divider style="width: 95%;position: absolute;" />
+    <el-divider style="width: 95%; position: absolute" />
     <div
       style="
         color: #ff914d;
@@ -76,25 +76,21 @@
                   end="23:00"
                   placeholder="Time"
                 />
-                <el-tooltip
-                  effect="dark"
-                  :disabled="!column.selectedLocation ? true : false"
-                  :content="column.selectedLocation"
+
+                <el-select
+                  :clearable="false"
+                  v-model="column.selectedLocation"
+                  placeholder="Select a Location"
+                  class="selection-location"
+                  size="small"
                 >
-                  <el-select
-                    :clearable="false"
-                    v-model="column.selectedLocation"
-                    placeholder="Select a Location"
-                    class="selection-location"
-                    size="small"
-                  >
-                    <el-option
-                      v-for="location in locations"
-                      :key="location"
-                      :label="location"
-                      :value="location"
-                    /> </el-select
-                ></el-tooltip>
+                  <el-option
+                    v-for="location in locations"
+                    :key="location"
+                    :label="location"
+                    :value="location"
+                  />
+                </el-select>
                 <span style="margin-left: 10px; color: #ff914d">Busy Level:</span>
                 <el-rate
                   v-model="column.busyLevel"
@@ -304,6 +300,7 @@ const toggleSelection = (column) => {
 .itinerary {
   position: relative;
   top: -10px;
+  left: 2px;
 
   @media (max-width: 600px) {
     top: 10px;
@@ -322,7 +319,7 @@ const toggleSelection = (column) => {
 }
 .func {
   overflow-x: hidden;
-  position:absolute;
+  position: absolute;
 
   width: 94%;
   height: 60vh;
