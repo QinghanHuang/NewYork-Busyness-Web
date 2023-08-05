@@ -14,7 +14,7 @@ public interface PoiMapper {
             "WHERE id = #{id}")
     PoiInfo getPoiInfoById (@Param("id") int id);
 
-    @Select("SELECT id, name, lng, lat FROM poi")
+    @Select("SELECT id, name, lng, lat,photo FROM poi")
     List<Poi> getAllPois();
 
 //    @Select("SELECT id FROM poi")
