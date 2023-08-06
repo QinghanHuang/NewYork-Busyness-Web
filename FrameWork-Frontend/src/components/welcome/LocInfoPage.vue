@@ -818,6 +818,7 @@ onMounted(() => {
     border-radius: 4px;
     background: var(--el-color-danger-light-9);
     color: var(--el-color-danger);
+    object-fit: cover;
   }
 }
 
