@@ -679,6 +679,7 @@ watchEffect(() => {
   };
   imgStyle.value = {
     height: props.isSmall ? "170px" : "",
+    objectFit: 'cover'
   };
   funcBtnStyle.value = {
     position: "absolute",
@@ -811,7 +812,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: auto;
+    object-fit: cover;
     height: 250px;
     margin: 10px;
     border-radius: 4px;
