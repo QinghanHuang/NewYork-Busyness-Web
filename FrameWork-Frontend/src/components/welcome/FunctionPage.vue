@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <el-divider style="width: 95%; position: absolute" />
+    <el-divider style="width: 95%; position: absolute;top:70px" />
     <div
       style="
         color: #ff914d;
