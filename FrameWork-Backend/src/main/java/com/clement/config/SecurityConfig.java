@@ -48,12 +48,8 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests((authorize) -> authorize
                         //login
-                        .requestMatchers("/api/auth/**","/api/weather/**","/api/prediction/**","/api/poi/all")
+                        .requestMatchers("/api/auth/**","/api/weather/**","/api/prediction/**","/api/poi/all","/public/**")
                         .permitAll()
-                        //weather makers
-//                        .requestMatchers("/api/weather/**","api/prediction/**","api/poi/all")
-//                        .permitAll()
-                        //swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**")
                         .permitAll()
                         .anyRequest()
