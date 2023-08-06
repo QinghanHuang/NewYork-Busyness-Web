@@ -140,7 +140,7 @@ const login = () => {
     </div>
 
     <div style="background-color: #305a92; color: rgb(235, 235, 235); font-size: 13px;margin: 15px 0px;width: 100%;"
-      >——————————— No Account ———————————</div
+      >——— No Account ———</div
     >
 
     <div>
