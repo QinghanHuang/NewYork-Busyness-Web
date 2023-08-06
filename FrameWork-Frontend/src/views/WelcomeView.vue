@@ -38,8 +38,7 @@ const futureDates = ref([]);
 const forecastTime = ref(0);
 const todayDate = ref("");
 const directionsDisplay = new google.maps.DirectionsRenderer();
-const infoWindowList = [];
-
+let infoWindowList = [];
 let currTime;
 let weatherCurData;
 let weatherForDate;
@@ -91,7 +90,7 @@ watchEffect(() => {
   weatherWindowPlacement.value = isSmall ? "right" : "right";
   infoWindowCloseBtnStyle.value = {
     position: "absolute",
-    right: isSmall ? "15px" : "500px",
+    right: isSmall ? "15px" : "501px",
     top: isSmall ? "calc(0.6 * var(--screen-height) - 32px)" : "45%",
   };
   titleBarStyle.value = {
@@ -264,7 +263,6 @@ const setWeather = () => {
 // ----------------------map relative----------------------
 // move Map Center
 const moveHome = () => {
-  console.log(11111);
   store.commit("setInfoWindowShow", false);
   clear();
   map.panTo({ lat: 40.74039, lng: -73.99937 });
@@ -348,7 +346,7 @@ const geocode = (request) => {
 
 const isLoginFail = () => {
   if (!computed(() => store.state.auth).value) {
-    ElMessage.warning("login to use this function");
+    ElMessage.warning("Please Login");
     openSideBar();
     return true;
   }
@@ -359,6 +357,7 @@ const throttledIsLoginFail = throttle(isLoginFail, 200);
 // ----------------------slider function----------------------
 const sliderTimeChange = () => {
   if (throttledIsLoginFail()) return;
+  store.commit("setInfoWindowShow", false);
   const targetTime =
     forecastTime.value < 10
       ? `${todayDate.value}-0${forecastTime.value}`
@@ -408,26 +407,16 @@ const setMarkers = async (currTime, todayDate) => {
 
   loading.close();
 
-  const adviseDict = {
-    1: "Enjoy the tranquility and serenity.",
-    2: "Experience the charm and beauty of this popular destination without the crowds.",
-    3: "Discover the vibrant atmosphere and cultural attractions of this bustling hotspot.",
-    4: "Embrace the energy and excitement of this lively destination, but be prepared for crowds.",
-    5: "Explore the iconic landmarks and must-see attractions of this bustling metropolis, but be ready for large crowds and queues.",
-  };
-
   if (!dataList) return;
   const locationInfo = computed(() => store.state.poiInfo).value;
   dataList.forEach((data) => {
     if (data.time !== currTime) return;
     const ID = data.pid;
     const busyLevel = data.busy;
-    const color = colorDict[busyLevel];
 
     const customMarker = new window.google.maps.Marker({
       position: locationInfo[ID - 1].location,
       animation: google.maps.Animation.DROP,
-      title: locationInfo[ID - 1].name,
       map,
       icon: {
         url: iconDict[data.busy],
@@ -445,13 +434,28 @@ const setMarkers = async (currTime, todayDate) => {
 
     // click info window
     const contentString = `
-    <div style="position: relative; top: -15px; width:200px;height:110px;">
-      <h3>${locationInfo[ID - 1].name}</h3>
-      <p>${adviseDict[data.busy]}</p>
+    <div style="position: relative; top: -15px; width:100px;height:${locationInfo[ID - 1].name.length *1.55 + 80}px;text-align:center">
+      <h4>${locationInfo[ID - 1].name}</h4>
+      <img style="" src="${locationInfo[ID - 1].photo}" alt="${
+        locationInfo[ID - 1].name
+      } img" width="100" height="70" >
     </div>
     `;
 
+    customMarker.addListener("mouseover", () => {
+      if(computed(()=>store.state.infoWindowShow).value) return
+      mapInfoWindow.setContent(contentString);
+      mapInfoWindow.open(map, customMarker);
+    });
+
+    customMarker.addListener("mouseout", () => {
+      if(computed(()=>store.state.infoWindowShow).value) return
+      // mapInfoWindow.close();
+    });
+
     customMarker.addListener("click", () => {
+      
+      if (isLoginFail()) return;
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
 
@@ -529,6 +533,12 @@ const disappearHeatmap = () => heatMapObj.setMap(null);
 
 // show heatmap
 const showHeatmap = () => {
+  directionsDisplay.setMap(null);
+  if (infoWindowList.length) {
+    infoWindowList.forEach((infoWindow) => {
+      infoWindow.close();
+    });
+  }
   if (isSmallScreen.value) store.commit("setInfoWindowShow", false);
   moveHome();
   heatMapObj.setMap(map);
@@ -549,6 +559,7 @@ const mapStyleChange = () => {
 
 // show poi location info
 const showLocInfo = (id) => {
+  if (isLoginFail()) return;
   store.commit("setLocationID", id);
   store.commit("setInfoWindowShow", true);
   if (!isSmallScreen.value) moveMapCenter(0.01, 0);
@@ -585,19 +596,17 @@ const outsideClickFold = (event) => {
 };
 
 const showMarkerBegin = async () => {
-  setWeather();
   // store poi and taxi zone info
   await get("/api/poi/all", (res) => store.commit("setPoiInfo", res));
   await setMarkers(currTime, todayDate);
   setHeatMap(currTime, todayDate);
-  setWeather();
 };
 
 watchEffect(async () => {
   // watch the login auth of user
   const userAuth = computed(() => store.state.auth);
   if (userAuth.value) {
-    showMarkerBegin();
+    // showMarkerBegin();
   }
 });
 
@@ -609,8 +618,13 @@ watchEffect(() => {
 
 // life circle functions
 onMounted(() => {
-  // test
-  // get("/api/weather/forecast", (res) => console.log("/api/weather/forecast", res));
+  // set auth
+  get("/api/user/me", (info) => {
+    store.commit("setAuth", true);
+  });
+
+  // set weather
+  setWeather();
 
   // adjust side bar size
   handleWindowResize();
@@ -620,8 +634,8 @@ onMounted(() => {
   document.addEventListener("click", outsideClickFold);
 
   // side bar effect
-  store.commit("setSideBarShow", true);
-  showOverlay.value = true;
+  // store.commit("setSideBarShow", true);
+  // showOverlay.value = true;
 
   // map options
   mapOptions = {
@@ -679,6 +693,7 @@ onMounted(() => {
       map.setCenter(place.geometry.location);
       map.setZoom(15);
     }
+    if (isLoginFail()) return;
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
     marker.setMap(map);
@@ -699,7 +714,7 @@ onMounted(() => {
   const screenHeight = window.innerHeight;
   document.documentElement.style.setProperty("--screen-height", `${screenHeight}px`);
 
-  // showMarkerBegin()
+  showMarkerBegin();
 });
 
 onUnmounted(() => {
@@ -824,7 +839,7 @@ onUnmounted(() => {
       ></transition>
 
       <!-- weather part -->
-      <div class="weather-part" v-show="computed(() => store.state.auth).value">
+      <div class="weather-part">
         <el-popover
           :show-arrow="false"
           :trigger="weatherWindowTrigger"
@@ -1099,7 +1114,7 @@ onUnmounted(() => {
     @media (max-width: 600px) {
       top: 60%;
       width: 100vw;
-      height: calc(0.75 * var(--screen-height));
+      height: calc(0.8 * var(--screen-height));
     }
   }
 }

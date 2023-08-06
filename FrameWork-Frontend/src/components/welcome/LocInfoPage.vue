@@ -1,5 +1,6 @@
 <template>
   <div :style="widthStyle">
+    <!-- image -->
     <el-scrollbar ref="scrollbarRef" :native="false" class="custom-scrollbar" :noresize="true">
       <div class="scrollbar-flex-content">
         <el-image
@@ -12,97 +13,162 @@
         />
       </div>
     </el-scrollbar>
+    <!-- lcoation name -->
     <div style="margin-left: 20px; color: #e4e4e4; margin-top: -15px">
       <h1>{{ locationName }}</h1>
     </div>
+    <!-- opentime  and -->
     <div class="open-time" style="margin-top: -20px; margin-left: 20px; color: #e4e4e4">
       {{ openTimeText }}
-      <div :style="funcBtnStyle" style="display: flex; flex-direction: row">
-        <!-- route popover -->
-        <div style="margin-right: 5px">
-          <el-popover
-            :visible="routeVisible"
-            :show-arrow="false"
-            trigger="click"
-            :width="350"
-            popper-style="border-radius: 10px;background-color: #305a92;box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+    </div>
+    <!-- function btn -->
+    <div :style="funcBtnStyle" style="display: flex; flex-direction: row">
+      <!-- echarts -->
+      <div style="margin-right: 5px">
+        <el-tooltip effect="dark" content="Show Statics">
+          <el-button
+            class="add-shadow"
+            color="#0c70b2"
+            :icon="DataLine"
+            circle
+            size="small"
+            @click="dialogStaticVisible = true"
+        /></el-tooltip>
+        <el-dialog
+          v-model="dialogStaticVisible"
+          style="
+            background-color: #305a92;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+          "
+          :style="{ width: isSmall ? '95%' : '' }"
+          @open="echartsShow = true"
+          @close="echartsShow = false"
+        >
+          <h2 style="color: whitesmoke; position: absolute; top: 0%">Statistical Graph</h2>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            "
           >
-            <div style="height: 150px; width: 100%">
-              <el-input
-                v-model="origin"
-                ref="inputRef"
-                placeholder="Search location"
-                class="search-input"
-              >
-                <template #prepend style="font-size: 20px"> Origin </template>
-                <template #append>
-                  <el-tooltip effect="dark" content="Your Location">
-                    <el-button :icon="Location" @click="accquirePlace"
-                  /></el-tooltip>
-                </template>
-              </el-input>
-              <el-input
-                v-model="destination"
-                placeholder="Search location"
-                class="search-input"
-                ref="inputRefDes"
-                ><template #prepend>Destination</template>
-                <template #append>
-                  <el-tooltip effect="dark" content="This Place">
-                    <el-button :icon="Place" @click="destination = locationName"
-                  /></el-tooltip>
-                </template>
-              </el-input>
-              <el-button
-                style="
-                  position: relative;
-                  top: 15px;
-                  left: 105px;
-                  border-radius: 4px;
-                  box-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
-                "
-                color="#305a92"
-                @click="showRoute"
-                >Show Route</el-button
-              >
+            <v-charts
+              v-if="echartsShow"
+              :option="chartOptions"
+              style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px"
+            ></v-charts>
+            <hr style="width: 100%" />
+            <div
+              style="
+                width: 100%;
+                height: 208px;
+                overflow: hidden;
+                border-radius: 10px;
+                background-color: #305a92;
+                margin-top: 0px;
+              "
+            >
+              <v-charts
+                v-if="echartsShow"
+                :option="chartOptions2"
+                style="width: 100%; height: 210px; overflow: hidden; border-radius: 10px"
+              ></v-charts>
             </div>
-            <div style="text-align: right; margin: 0">
-              <el-button size="small" color="#305a92" @click="clearRoute">CLEAR</el-button>
-              <el-button
-                style="margin-left: 170px"
-                size="small"
-                color="black"
-                text
-                @click="routeVisible = false"
-                >CANCEL</el-button
-              >
-            </div>
-
-            <template #reference>
-              <div>
-                <el-tooltip effect="dark" content="To This Place">
-                  <el-button
-                    color="#17a25d"
-                    :icon="Bicycle"
-                    circle
-                    size="small"
-                    @click="routeVisible = true"
+          </div>
+        </el-dialog>
+      </div>
+      <!-- route popover -->
+      <div style="margin-right: 5px">
+        <el-popover
+          :visible="routeVisible"
+          :show-arrow="false"
+          trigger="click"
+          :width="350"
+          popper-style="border-radius: 10px;background-color: #305a92;box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+        >
+          <div style="height: 100px; width: 100%">
+            <el-input
+              v-model="origin"
+              ref="inputRef"
+              placeholder="Search location"
+              class="search-input"
+            >
+              <template #prepend>Origin</template>
+              <template #append>
+                <el-tooltip effect="dark" content="Your Location">
+                  <el-button :icon="Location" @click="accquirePlace"
                 /></el-tooltip>
-              </div>
-            </template>
-          </el-popover>
-        </div>
-        <div>
-          <el-tooltip effect="dark" content="Add to Itinerary">
-            <el-button type="warning" :icon="Star" circle size="small" @click="addItinerary"
-          /></el-tooltip>
-        </div>
+              </template>
+            </el-input>
+            <el-input
+              v-model="destination"
+              placeholder="Search location"
+              class="search-input"
+              ref="inputRefDes"
+              ><template #prepend>&nbspDest.</template>
+              <template #append>
+                <el-tooltip effect="dark" content="Switch">
+                  <el-button :icon="Sort" @click="switchPlace"
+                /></el-tooltip>
+              </template>
+            </el-input>
+            <el-button
+              style="
+                position: relative;
+                top: 10px;
+                left: 103px;
+                border-radius: 4px;
+                box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+                --el-button-text-color: white;
+              "
+              color="#ff8030"
+              @click="showRoute"
+              >Show Route</el-button
+            >
+          </div>
+          <div style="text-align: right; margin: 0">
+            <el-button size="small" color="#305a92" @click="clearRoute">CLEAR</el-button>
+            <el-button
+              style="margin-left: 170px"
+              size="small"
+              color="#305a92"
+              @click="routeVisible = false"
+              >CANCEL</el-button
+            >
+          </div>
+
+          <template #reference>
+            <div>
+              <el-tooltip effect="dark" content="To This Place">
+                <el-button
+                  class="add-shadow"
+                  color="#17a25d"
+                  :icon="Bicycle"
+                  circle
+                  size="small"
+                  @click="routeVisible = true"
+              /></el-tooltip>
+            </div>
+          </template>
+        </el-popover>
+      </div>
+      <!-- add itinerary -->
+      <div>
+        <el-tooltip effect="dark" content="Add to Itinerary">
+          <el-button
+            class="add-shadow"
+            type="warning"
+            :icon="Star"
+            circle
+            size="small"
+            @click="addItinerary"
+        /></el-tooltip>
       </div>
     </div>
     <div style="margin-left: 20px; display: flex; flex-direction: row">
-      <div style="position: relative; top: 10px; color: #ff914d; font-size: 20px">
-        Current Busy Level :
-      </div>
+      <div style="position: relative; top: 10px; color: #ff914d; font-size: 20px">Busy Level :</div>
       &nbsp&nbsp
       <el-rate
         style="position: relative; top: 4px"
@@ -124,6 +190,19 @@
         {{ locationDes }}
       </p>
     </div>
+    <!-- mask -->
+    <div
+      v-show="routeVisible"
+      style="
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+      :style="{ height: isSmall ? '75vh' : '100vh' }"
+    ></div>
   </div>
 </template>
 
@@ -141,9 +220,38 @@ import {
   OfficeBuilding,
   Location,
   Place,
+  DataLine,
+  Sort,
 } from "@element-plus/icons-vue";
 import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
+import VCharts from "vue-echarts";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { GridComponent } from "echarts/components";
+import { LineChart } from "echarts/charts";
+import { TitleComponent, TooltipComponent } from "echarts/components";
+import {
+  DataZoomComponent,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+  DatasetComponent,
+} from "echarts/components";
+import { BarChart } from "echarts/charts";
+import * as echarts from "echarts/core";
+
+use([
+  CanvasRenderer,
+  LineChart,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  DataZoomComponent,
+  BarChart,
+  DataZoomInsideComponent,
+  DataZoomSliderComponent,
+  DatasetComponent,
+]);
 
 let data;
 const routeVisible = ref(false);
@@ -155,6 +263,9 @@ const value = ref();
 const urls = ref([]);
 const inputRef = ref(null);
 const inputRefDes = ref(null);
+const overlayShow = ref(false);
+const dialogStaticVisible = ref(false);
+const echartsShow = ref(false);
 
 let yourLocation;
 let autoOptions;
@@ -188,6 +299,260 @@ const scrollbarRef = ref(null);
 const origin = ref("");
 const destination = ref("");
 
+// **********************echarts**********************
+const chartOptions = ref({
+  backgroundColor: "#305a92",
+  borderRadius: "10px",
+  title: {
+    textStyle: {
+      fontSize: 14,
+      color: "#e5e5e5",
+    },
+    left: "center",
+  },
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      lineStyle: {
+        color: "#e5e5e5",
+      },
+    },
+  },
+  grid: {
+    left: "3%",
+    right: "4%",
+    bottom: "3%",
+    top: "70px",
+    containLabel: true,
+  },
+  xAxis: [
+    {
+      type: "category",
+      boundaryGap: false,
+      axisLine: {
+        lineStyle: {
+          color: "#e5e5e5",
+        },
+      },
+      axisLabel: {
+        margin: 15,
+        fontSize: 10,
+        rotate: -45,
+      },
+      data: ["00:00"],
+    },
+  ],
+  yAxis: [
+    {
+      type: "value",
+      name: "Busy Level",
+      nameTextStyle: {
+        align: "left",
+      },
+      min: 0,
+      max: 5,
+      minInterval: 1,
+      axisTick: {
+        show: false,
+      },
+      axisLine: {
+        lineStyle: {
+          color: "#e5e5e5",
+        },
+      },
+      axisLabel: {
+        margin: 5,
+        fontSize: 11,
+      },
+      splitLine: {
+        lineStyle: {
+          color: "#57617B",
+        },
+      },
+    },
+  ],
+  series: [
+    {
+      type: "line",
+      smooth: true,
+      symbol: "circle",
+      symbolSize: 5,
+      showSymbol: false,
+      lineStyle: {
+        width: 1,
+      },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(
+          0,
+          0,
+          0,
+          1,
+          [
+            {
+              offset: 0,
+              color: "rgba(255, 145, 77, 0.3)",
+            },
+            {
+              offset: 0.8,
+              color: "rgba(255, 145, 77, 0)",
+            },
+          ],
+          false
+        ),
+        shadowColor: "rgba(0, 0, 0, 0.1)",
+        shadowBlur: 10,
+      },
+      itemStyle: {
+        color: "rgb(255, 145, 77)",
+        borderColor: "rgba(255, 145, 77,0.27)",
+        borderWidth: 12,
+      },
+      data: [220, 182, 191, 134, 150, 120, 110, 125, 145, 122, 165, 122],
+    },
+  ],
+});
+
+const chartOptions2 = ref({
+  title: {
+    text: "Busy Level of All POI",
+    textStyle: {
+      fontSize: 14,
+      color: "#e5e5e5",
+    },
+    left: "center",
+  },
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      lineStyle: {
+        color: "#e5e5e5",
+      },
+    },
+    confine: true,
+  },
+  grid: {
+    bottom: "auto",
+    width: "93%",
+    left: "3%",
+    containLabel: true,
+    transformOrigin: "center center",
+  },
+  xAxis: [
+    {
+      type: "category",
+      axisPointer: {
+        type: "shadow",
+      },
+      axisLine: {
+        lineStyle: {
+          color: "#e5e5e5",
+        },
+      },
+      axisLabel: {
+        show: true,
+        interval: 0,
+        rotate: -45,
+        color: "#e5e5e5",
+        formatter: function (value) {
+          if (value.length > 10) return value.substring(0, 10) + "...";
+          return value;
+        },
+      },
+    },
+  ],
+  yAxis: [
+    {
+      type: "value",
+      name: "Busy Level",
+      nameTextStyle: {
+        align: "left",
+      },
+      min: 0,
+      axisLabel: {
+        formatter: "{value}",
+      },
+      axisLine: {
+        lineStyle: {
+          color: "#e5e5e5",
+        },
+      },
+      splitLine: {
+        lineStyle: {
+          color: "#57617B",
+        },
+      },
+      minInterval: 1,
+    },
+  ],
+  dataset: {
+    source: [
+      {
+        name: "1",
+        number: 5,
+      },
+    ],
+  },
+  dataZoom: [
+    {
+      type: "slider",
+      show: true,
+      backgroundColor: "#F6F5F3",
+      fillerColor: "#BBC4D3",
+      borderColor: "rgba(19, 63, 100, 0)",
+      borderRadius: 10,
+      showDetail: false,
+      startValue: 0,
+      endValue: props.isSmall ? 10 : 20,
+      filterMode: "empty",
+      width: "100%",
+      height: 8,
+      left: "center",
+      zoomLoxk: true,
+      handleSize: 0,
+      bottom: 0,
+    },
+    {
+      type: "inside",
+      zoomOnMouseWheel: false,
+      moveOnMouseMove: true,
+      moveOnMouseWheel: true,
+    },
+  ],
+  series: [
+    {
+      itemStyle: {
+        color: {
+          type: "linear",
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 1,
+              color: "#fff2ea",
+            },
+            {
+              offset: 0,
+              color: "#d07841",
+            },
+          ],
+        },
+      },
+      type: "bar",
+      color: "#5087ec",
+      barMaxWidth: 10,
+      barGap: "200%",
+    },
+  ],
+});
+//***************************************************
+
+const switchPlace = () => {
+  const temp = origin.value;
+  origin.value = destination.value;
+  destination.value = temp;
+};
 const addItinerary = () => {
   routeVisible.value = false;
 
@@ -239,6 +604,21 @@ const getTargetInfo = (ID) => {
   return item;
 };
 
+const setDataAllPoiGraph = () => {
+  const poiListData = computed(() => store.state.predictData).value;
+  const poiDataAll = computed(() => store.state.poiInfo).value;
+  const dataSet = [];
+  for (let i = 0; i < poiListData.length; i++) {
+    dataSet.push({
+      name: poiDataAll[i].name,
+      value: poiListData[i].busy,
+    });
+  }
+  // dataSet.sort((a, b) => (a.name > b.name ? 1 : -1));
+  dataSet.sort((a, b) => (a.value < b.value ? 1 : -1));
+  chartOptions2.value.dataset.source = dataSet;
+};
+
 const accquirePlace = () => {
   origin.value = "Your Location";
   if (navigator.geolocation) {
@@ -276,7 +656,6 @@ const accquirePlace = () => {
 };
 
 const clearRoute = () => {
-  console.log(directionsDisplay);
   const emptyDirectionsResult = {
     routes: [],
     status: google.maps.DirectionsStatus.OK,
@@ -308,18 +687,31 @@ watchEffect(() => {
   };
   const ID = locationID.value;
   const url = `/api/poi/${ID}`;
+
+  const allData = computed(() => store.state.poiData).value;
+  const dateOfAdayList = allData.filter((item) => item.pid === ID).map((item) => item.busy);
+  chartOptions.value.series[0].data = dateOfAdayList;
   get(url, (res) => {
     data = res;
     locationName.value = data.name;
     destination.value = data.name;
+    chartOptions.value.title.text = `Busy Level of \n ${locationName.value}\n`;
+    destination.value = data.name;
     locationDes.value = data.introduction;
+    setDataAllPoiGraph();
     const busy = getTargetInfo(ID).busy;
     value.value = busy;
+    data.img.reverse();
     urls.value = data.img;
     openTimeText.value = isOpen(data.openTime.open, data.openTime.close)
       ? `OPEN NOW (${data.openTime.open} - ${data.openTime.close})`
       : `CLOSED (${data.openTime.open} - ${data.openTime.close})`;
   });
+});
+
+watchEffect(() => {
+  const trackValue = computed(() => store.state.sideBarShow).value;
+  if (trackValue) routeVisible.value = false;
 });
 
 const closeInfowindow = () => store.commit("setInfoWindowShow", false);
@@ -361,7 +753,7 @@ const showRoute = () => {
   routeVisible.value = false;
   const request = {
     origin: origin.value === "Your Location" ? yourLocation : origin.value,
-    destination: destination.value,
+    destination: destination.value === "Your Location" ? yourLocation : destination.value,
     travelMode: google.maps.TravelMode.WALKING, // You can change this to WALKING or TRANSIT
   };
 
@@ -398,6 +790,15 @@ onMounted(() => {
 
   directionsService = new google.maps.DirectionsService();
   directionsDisplay.setMap(props.map);
+
+  //set echarts options
+  const timeList = [];
+  for (let i = 0; i < 24; i++) {
+    const hour = i.toString().padStart(2, "0");
+    timeList.push(`${hour}:00`);
+  }
+
+  chartOptions.value.xAxis[0].data = timeList;
 });
 </script>
 
@@ -436,5 +837,9 @@ onMounted(() => {
 }
 .pac-container {
   z-index: 10000;
+}
+
+.add-shadow {
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
 }
 </style>

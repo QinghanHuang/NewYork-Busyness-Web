@@ -32,7 +32,8 @@ let itineraryObj = [
   },
 ];
 let predictDataObj = [];
-let targetInfoObj =[]
+let targetInfoObj = [];
+let dataOfAdayObj = [];
 
 const store = createStore({
   state() {
@@ -50,7 +51,8 @@ const store = createStore({
       busy: 1,
       itinerary: itineraryObj,
       predictData: predictDataObj,
-      targetInfo: targetInfoObj
+      targetInfo: targetInfoObj,
+      dataOfAday: dataOfAdayObj,
     };
   },
   mutations: {
@@ -90,12 +92,15 @@ const store = createStore({
     setItinerary(state, obj) {
       state.itinerary = obj;
     },
-    setPredictData(state, obj){
-      state.predictData = obj
+    setPredictData(state, obj) {
+      state.predictData = obj;
     },
-    setTargetInfo( state, obj){
-      state.targetInfo = obj
-    }
+    setTargetInfo(state, obj) {
+      state.targetInfo = obj;
+    },
+    setDateOfAday(state, obj) {
+      state.dataOfAday = obj;
+    },
   },
   actions: {
     updateUserName({ commit }, value) {
