@@ -118,7 +118,7 @@
               style="
                 position: relative;
                 top: 10px;
-                left: 103px;
+                left: 100px;
                 border-radius: 4px;
                 box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
                 --el-button-text-color: white;
@@ -128,10 +128,10 @@
               >Show Route</el-button
             >
           </div>
-          <div style="text-align: right; margin: 0">
-            <el-button size="small" color="#305a92" @click="clearRoute">CLEAR</el-button>
+          <div style="text-align: right; margin: 0;height: 30px;">
+            <el-button style="position: absolute; left: 10px;" size="small" color="#305a92" @click="clearRoute">CLEAR</el-button>
             <el-button
-              style="margin-left: 170px"
+              style="position: absolute; right: 10px;"
               size="small"
               color="#305a92"
               @click="routeVisible = false"
@@ -818,6 +818,7 @@ onMounted(() => {
     border-radius: 4px;
     background: var(--el-color-danger-light-9);
     color: var(--el-color-danger);
+    object-fit: cover;
   }
 }
 
