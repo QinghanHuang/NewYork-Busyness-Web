@@ -77,11 +77,11 @@ const colorDict = {
   5: "red",
 };
 const iconDict = {
-  1: "../src/assets/icon_svg/1.png",
-  2: "../src/assets/icon_svg/2.png",
-  3: "../src/assets/icon_svg/3.png",
-  4: "../src/assets/icon_svg/4.png",
-  5: "../src/assets/icon_svg/5.png",
+  1: "../public/1.svg",
+  2: "../public/2.svg",
+  3: "../public/3.svg",
+  4: "../public/4.svg",
+  5: "../public/5.svg",
 };
 
 watchEffect(() => {
@@ -434,27 +434,28 @@ const setMarkers = async (currTime, todayDate) => {
 
     // click info window
     const contentString = `
-    <div style="position: relative; top: -15px; width:100px;height:${locationInfo[ID - 1].name.length *1.55 + 80}px;text-align:center">
+    <div style="position: relative; top: -15px; width:100px;height:${
+      locationInfo[ID - 1].name.length * 1.55 + 80
+    }px;text-align:center">
       <h4>${locationInfo[ID - 1].name}</h4>
       <img style="" src="${locationInfo[ID - 1].photo}" alt="${
-        locationInfo[ID - 1].name
-      } img" width="100" height="70" >
+      locationInfo[ID - 1].name
+    } img" width="100" height="70" >
     </div>
     `;
 
     customMarker.addListener("mouseover", () => {
-      if(computed(()=>store.state.infoWindowShow).value) return
+      if (computed(() => store.state.infoWindowShow).value) return;
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
     });
 
     customMarker.addListener("mouseout", () => {
-      if(computed(()=>store.state.infoWindowShow).value) return
+      if (computed(() => store.state.infoWindowShow).value) return;
       // mapInfoWindow.close();
     });
 
     customMarker.addListener("click", () => {
-      
       if (isLoginFail()) return;
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
@@ -619,9 +620,7 @@ watchEffect(() => {
 // life circle functions
 onMounted(() => {
   // set auth
-  get("/api/user/me", (info) => {
-    store.commit("setAuth", true);
-  });
+  // get("/api/user/me", () => store.commit("setAuth", true));
 
   // set weather
   setWeather();
