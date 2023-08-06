@@ -253,7 +253,6 @@ const setWeather = () => {
   // weather api
   get("/api/weather/current", (res) => {
     weatherCurData = res;
-    console.log(weatherCurData);
     weatherSrc.value = `https://openweathermap.org/img/wn/${
       weatherIconDict[weatherCurData.weatherId]
     }@2x.png`;
@@ -264,7 +263,6 @@ const setWeather = () => {
 // ----------------------map relative----------------------
 // move Map Center
 const moveHome = () => {
-  console.log(11111);
   store.commit("setInfoWindowShow", false);
   clear();
   map.panTo({ lat: 40.74039, lng: -73.99937 });
@@ -438,7 +436,7 @@ const setMarkers = async (currTime, todayDate) => {
     const contentString = `
     <div style="position: relative; top: -15px; width:100px;height:${locationInfo[ID - 1].name.length *1.55 + 80}px;text-align:center">
       <h4>${locationInfo[ID - 1].name}</h4>
-      <img style="position: relative; top: -10px;" src="https://media.tacdn.com/media/attractions-splice-spp-674x446/0b/27/58/b7.jpg" alt="${
+      <img style="" src="${locationInfo[ID - 1].photo}" alt="${
         locationInfo[ID - 1].name
       } img" width="100" height="70" >
     </div>
@@ -456,6 +454,7 @@ const setMarkers = async (currTime, todayDate) => {
     });
 
     customMarker.addListener("click", () => {
+      
       if (isLoginFail()) return;
       mapInfoWindow.setContent(contentString);
       mapInfoWindow.open(map, customMarker);
@@ -620,7 +619,7 @@ watchEffect(() => {
 // life circle functions
 onMounted(() => {
   // set auth
-  get("/api/user/me", () => {
+  get("/api/user/me", (info) => {
     store.commit("setAuth", true);
   });
 

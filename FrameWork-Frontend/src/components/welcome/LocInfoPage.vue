@@ -549,9 +549,9 @@ const chartOptions2 = ref({
 //***************************************************
 
 const switchPlace = () => {
-    const temp = origin.value
-    origin.value = destination.value;
-    destination.value = temp
+  const temp = origin.value;
+  origin.value = destination.value;
+  destination.value = temp;
 };
 const addItinerary = () => {
   routeVisible.value = false;
@@ -656,7 +656,6 @@ const accquirePlace = () => {
 };
 
 const clearRoute = () => {
-  console.log(directionsDisplay);
   const emptyDirectionsResult = {
     routes: [],
     status: google.maps.DirectionsStatus.OK,
@@ -691,18 +690,18 @@ watchEffect(() => {
 
   const allData = computed(() => store.state.poiData).value;
   const dateOfAdayList = allData.filter((item) => item.pid === ID).map((item) => item.busy);
-  console.log(dateOfAdayList);
   chartOptions.value.series[0].data = dateOfAdayList;
   get(url, (res) => {
     data = res;
     locationName.value = data.name;
-    destination.value = data.name
+    destination.value = data.name;
     chartOptions.value.title.text = `Busy Level of \n ${locationName.value}\n`;
     destination.value = data.name;
     locationDes.value = data.introduction;
     setDataAllPoiGraph();
     const busy = getTargetInfo(ID).busy;
     value.value = busy;
+    data.img.reverse();
     urls.value = data.img;
     openTimeText.value = isOpen(data.openTime.open, data.openTime.close)
       ? `OPEN NOW (${data.openTime.open} - ${data.openTime.close})`

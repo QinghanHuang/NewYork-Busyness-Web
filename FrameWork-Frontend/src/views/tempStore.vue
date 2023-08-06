@@ -263,7 +263,6 @@ const setWeather = () => {
 // ----------------------map relative----------------------
 // move Map Center
 const moveHome = () => {
-  console.log(11111);
   store.commit("setInfoWindowShow", false);
   clear();
   map.panTo({ lat: 40.74039, lng: -73.99937 });
