@@ -18,6 +18,7 @@ import { throttle, debounce } from "lodash";
 import InfoPage from "../components/welcome/LocInfoPage.vue";
 import WeatherPage from "../components/welcome/WeatherPage.vue";
 import { weatherIconDict } from "../assets/weather/weatherIconDict.js";
+import axios from "axios";
 
 // define
 const store = useStore();
@@ -77,11 +78,11 @@ const colorDict = {
   5: "red",
 };
 const iconDict = {
-  1: "../public/1.svg",
-  2: "../public/2.svg",
-  3: "../public/3.svg",
-  4: "../public/4.svg",
-  5: "../public/5.svg",
+  1: "/1.svg",
+  2: "/2.svg",
+  3: "/3.svg",
+  4: "/4.svg",
+  5: "/5.svg",
 };
 
 watchEffect(() => {
@@ -129,12 +130,10 @@ watchEffect(() => {
     overflow: "hidden",
     backdropFilter: "blur(5px)",
     width: "60px",
-    // backgroundColor: "white",
     boxShadow: "0 0 5px rgba(0, 0, 0, 1)",
     borderRadius: "10px",
     paddingTop: "50px",
     paddingBottom: "20px",
-    transition: "bottom  0.5s ease, height 0.5s ease",
     bottom: isSmall
       ? infoWindowShow.value
         ? "calc(0.47 * var(--screen-height))"
@@ -142,6 +141,10 @@ watchEffect(() => {
       : "80px",
     height: isSmall ? (infoWindowShow.value ? "200px" : "350px") : "350px",
     left: isSmall ? "10px" : "10px",
+    // display: isSmall ? (infoWindowShow.value ? "none" : "block") : "block",
+    opacity: isSmall ? (infoWindowShow.value ? "0" : "1") : "1",
+    visibility: isSmall ? (infoWindowShow.value ? "hidden" : "visible") : "",
+    transition: "opacity 0.5s ease, bottom 0.5s ease, visibility 0.5s ease",
   };
   zoomStyle.value = {
     flexDirection: isSmall ? "column" : "row",
@@ -163,9 +166,9 @@ watchEffect(() => {
     width: isSmall ? "330px" : "500px",
   };
   inputStyle.value = {
-    position: "relative",
-    top: isSmall ? "70px" : "",
-    left: isSmall ? "8%" : "",
+    position: "fixed",
+    top: isSmall ? "60px" : "",
+    left: isSmall ? "80px" : "",
     width: isSmall ? "75vw" : infoWindowShow.value ? "300px" : "400px",
   };
   buttonStyle.value = {
@@ -353,7 +356,7 @@ const isLoginFail = () => {
 
   return false;
 };
-const throttledIsLoginFail = throttle(isLoginFail, 200);
+const throttledIsLoginFail = debounce(isLoginFail, 100);
 // ----------------------slider function----------------------
 const sliderTimeChange = () => {
   if (throttledIsLoginFail()) return;
@@ -618,9 +621,19 @@ watchEffect(() => {
 });
 
 // life circle functions
-onMounted(() => {
+onMounted(async () => {
   // set auth
-  // get("/api/user/me", () => store.commit("setAuth", true));
+  await axios
+    .get("/api/user/me", {
+      withCredentials: true,
+    })
+    .then(({ data }) => {
+      if (data.success) {
+        store.commit("setAuth", true);
+      } else {
+        console.log(data);
+      }
+    });
 
   // set weather
   setWeather();
@@ -756,7 +769,15 @@ onUnmounted(() => {
 
       <!-- switch map type -->
       <div :style="mapChooseStyle">
-        <div style="color: black; cursor: default; margin-right: 20px; margin-left: 20px">
+        <div
+          style="
+            font-size: 13px;
+            color: black;
+            cursor: default;
+            margin-right: 10px;
+            margin-left: 10px;
+          "
+        >
           <b>CHOOSE MAP STYLE</b>
         </div>
         <el-tooltip :content="'change to map: ' + mapStyleSwitch" placement="top">
@@ -778,32 +799,34 @@ onUnmounted(() => {
       </div>
 
       <!-- busy level forecast slider -->
-      <div style="position: absolute" :style="sliderStyle">
-        <el-dropdown
-          style="color: black; position: absolute; top: 9px; font-size: 17px; left: 10px"
+        <div
+          style="position: absolute"
+          :style="sliderStyle"
         >
-          {{ todayDate.slice(5) }}
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item
-                v-for="date in futureDates"
-                :key="date"
-                @click="handleDateSelect(date)"
-                >{{ date }}</el-dropdown-item
-              >
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        <el-slider
-          v-model="forecastTime"
-          vertical
-          :max="23"
-          :format-tooltip="formatTooltip"
-          @input="sliderTimeChange"
-          :marks="sliderTimeShow"
-        />
-      </div>
-
+          <el-dropdown
+            style="color: black; position: absolute; top: 9px; font-size: 17px; left: 10px"
+          >
+            {{ todayDate.slice(5) }}
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="date in futureDates"
+                  :key="date"
+                  @click="handleDateSelect(date)"
+                  >{{ date }}</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-slider
+            v-model="forecastTime"
+            vertical
+            :max="23"
+            :format-tooltip="formatTooltip"
+            @input="sliderTimeChange"
+            :marks="sliderTimeShow"
+          />
+        </div>
       <!-- open side bar button -->
       <div ref="openSideBarRef">
         <el-button
@@ -1113,7 +1136,7 @@ onUnmounted(() => {
     @media (max-width: 600px) {
       top: 60%;
       width: 100vw;
-      height: calc(0.8 * var(--screen-height));
+      height: calc(1 * var(--screen-height));
     }
   }
 }

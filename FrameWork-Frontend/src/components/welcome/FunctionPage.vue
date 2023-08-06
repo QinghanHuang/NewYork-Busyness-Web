@@ -26,13 +26,13 @@
         </div>
       </div>
     </div>
-    <el-divider style="width: 95%; position: absolute;top:70px" />
+    <el-divider style="width: 95%; position: absolute;top:75px" />
     <div
       style="
         color: #ff914d;
         position: absolute;
         left: 10px;
-        top: 92px;
+        top: 70px;
         display: flex;
         flex-direction: row;
       "
@@ -299,21 +299,16 @@ const toggleSelection = (column) => {
 }
 .itinerary {
   position: relative;
-  top: -10px;
+  top: 10px;
   left: 2px;
-
-  @media (max-width: 600px) {
-    top: 10px;
-  }
 }
 .instruction {
   color: rgb(238, 238, 238);
   position: relative;
-  top: 10px;
+  top: 35px;
   margin-left: 20px;
 
   @media (max-width: 600px) {
-    top: 35px;
     margin-left: 20px;
   }
 }
