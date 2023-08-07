@@ -556,7 +556,7 @@ const showLocInfo = (id) => {
   store.commit("setLocationID", id);
   store.commit("setInfoWindowShow", true);
   if (!isSmallScreen.value) moveMapCenter(0.01, 0);
-  else moveMapCenter(0, 0.003);
+  else moveMapCenter(0, 0.0015);
   if (!isHeatmap) marker.setMap(null);
 };
 
@@ -684,7 +684,7 @@ onMounted(async () => {
     }
 
     clear();
-    
+
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
