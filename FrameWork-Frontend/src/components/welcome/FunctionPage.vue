@@ -305,7 +305,7 @@ const toggleSelection = (column) => {
 .instruction {
   color: rgb(238, 238, 238);
   position: relative;
-  top: 35px;
+  top: 33px;
   margin-left: 20px;
 
   @media (max-width: 600px) {
