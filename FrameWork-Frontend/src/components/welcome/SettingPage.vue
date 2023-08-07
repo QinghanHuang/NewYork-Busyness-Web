@@ -11,7 +11,7 @@
           :size="100"
           :src="avatarDict[form.avatar]"
         />
-        <p class="upload-text" @click="chooseAvatar">click here choose your avatar</p>
+        <p class="upload-text" @click="chooseAvatar">Click here choose your avatar</p>
       </div>
       <el-divider />
       <el-form :model="form" label-width="100px" class="form">

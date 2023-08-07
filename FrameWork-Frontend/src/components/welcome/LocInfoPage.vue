@@ -426,7 +426,7 @@ const chartOptions = ref({
 
 const chartOptions2 = ref({
   title: {
-    text: "Busy Level of All POI",
+    text: "Current All POI Busy Level",
     textStyle: {
       fontSize: 14,
       color: "#e5e5e5",
@@ -711,7 +711,7 @@ watchEffect(() => {
     data = res;
     locationName.value = data.name;
     destination.value = data.name;
-    chartOptions.value.title.text = `Busy Level of a Day`;
+    chartOptions.value.title.text = `Daily Busy Level`;
     destination.value = data.name;
     locationDes.value = data.introduction;
     setDataAllPoiGraph();
