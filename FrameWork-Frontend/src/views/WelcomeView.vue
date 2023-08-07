@@ -415,8 +415,6 @@ const setMarkers = async (currTime, todayDate) => {
   dataList.forEach((data) => {
     if (data.time !== currTime) return;
     const ID = data.pid;
-    const busyLevel = data.busy;
-
     const customMarker = new window.google.maps.Marker({
       position: locationInfo[ID - 1].location,
       animation: google.maps.Animation.DROP,
@@ -465,7 +463,7 @@ const setMarkers = async (currTime, todayDate) => {
 
       map.panTo(locationInfo[ID - 1].location);
       store.commit("setBusy", data.busy);
-      showLocInfo(ID);
+      showLocInfo(locationInfo[ID - 1].id);
     });
 
     markerList.push(customMarker);
@@ -1129,14 +1127,12 @@ onUnmounted(() => {
     height: var(--screen-height);
     right: 0;
     top: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     border-radius: 5px;
     @media (max-width: 600px) {
       top: 60%;
       width: 100vw;
-      height: calc(1 * var(--screen-height));
+      height: calc(0.4 * var(--screen-height));
     }
   }
 }

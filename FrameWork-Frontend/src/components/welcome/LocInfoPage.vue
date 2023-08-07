@@ -1,220 +1,234 @@
 <template>
-  <div :style="widthStyle">
-    <!-- image -->
-    <el-scrollbar ref="scrollbarRef" :native="false" class="custom-scrollbar" :noresize="true">
-      <div class="scrollbar-flex-content">
-        <el-image
-          v-for="url in urls"
-          :key="url"
-          :src="url"
-          :preview-src-list="urls"
-          class="inline-image"
-          :style="imgStyle"
-        />
+  <el-scrollbar :native="isSmall"  :noresize="false">
+    <div :style="widthStyle">
+      <!-- image -->
+      <el-scrollbar>
+        <div class="scrollbar-flex-content">
+          <el-image
+            v-for="url in urls"
+            :key="url"
+            :src="url"
+            :preview-src-list="urls"
+            class="inline-image"
+            :style="imgStyle"
+          />
+        </div>
+      </el-scrollbar>
+      <!-- lcoation name -->
+      <div style="margin-left: 20px; color: #e4e4e4; margin-top: -15px">
+        <h1>{{ locationName }}</h1>
       </div>
-    </el-scrollbar>
-    <!-- lcoation name -->
-    <div style="margin-left: 20px; color: #e4e4e4; margin-top: -15px">
-      <h1>{{ locationName }}</h1>
-    </div>
-    <!-- opentime  and -->
-    <div class="open-time" style="margin-top: -20px; margin-left: 20px; color: #e4e4e4">
-      {{ openTimeText }}
-    </div>
-    <!-- function btn -->
-    <div :style="funcBtnStyle" style="display: flex; flex-direction: row">
-      <!-- echarts -->
-      <div style="margin-right: 5px">
-        <el-tooltip effect="dark" content="Show Statics">
-          <el-button
-            class="add-shadow"
-            color="#0c70b2"
-            :icon="DataLine"
-            circle
-            size="small"
-            @click="dialogStaticVisible = true"
-        /></el-tooltip>
-        <el-dialog
-          v-model="dialogStaticVisible"
-          style="
-            background-color: #305a92;
-            border-radius: 10px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 1);
-          "
-          :style="{ width: isSmall ? '95%' : '' }"
-          @open="echartsShow = true"
-          @close="echartsShow = false"
-        >
-          <h2 style="color: whitesmoke; position: absolute; top: 0%">Statistical Graph</h2>
-          <div
+      <!-- opentime  and -->
+      <div class="open-time" style="margin-top: -20px; margin-left: 20px; color: #e4e4e4">
+        {{ openTimeText }}
+      </div>
+      <!-- function btn -->
+      <div :style="funcBtnStyle" style="display: flex; flex-direction: row">
+        <!-- echarts -->
+        <div style="margin-right: 5px">
+          <el-tooltip effect="dark" content="Show Statics">
+            <el-button
+              class="add-shadow"
+              color="#0c70b2"
+              :icon="DataLine"
+              circle
+              size="small"
+              @click="dialogStaticVisible = true"
+          /></el-tooltip>
+          <el-dialog
+            v-model="dialogStaticVisible"
             style="
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
+              background-color: #305a92;
+              border-radius: 10px;
+              box-shadow: 0 0 5px rgba(0, 0, 0, 1);
             "
+            :style="{ width: isSmall ? '95%' : '' }"
+            @open="echartsShow = true"
+            @close="echartsShow = false"
           >
-            <v-charts
-              v-if="echartsShow"
-              :option="chartOptions"
-              style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px"
-            ></v-charts>
-            <hr style="width: 100%" />
+            <h2 style="color: whitesmoke; position: absolute; top: 0%">Statistical Graph</h2>
             <div
               style="
-                width: 100%;
-                height: 208px;
-                overflow: hidden;
-                border-radius: 10px;
-                background-color: #305a92;
-                margin-top: 0px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
               "
             >
               <v-charts
                 v-if="echartsShow"
-                :option="chartOptions2"
-                style="width: 100%; height: 210px; overflow: hidden; border-radius: 10px"
+                :option="chartOptions"
+                style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px"
               ></v-charts>
+              <hr style="width: 100%" />
+              <div
+                style="
+                  width: 100%;
+                  height: 208px;
+                  overflow: hidden;
+                  border-radius: 10px;
+                  background-color: #305a92;
+                  margin-top: 0px;
+                "
+              >
+                <v-charts
+                  v-if="echartsShow"
+                  :option="chartOptions2"
+                  style="width: 100%; height: 210px; overflow: hidden; border-radius: 10px"
+                ></v-charts>
+              </div>
             </div>
-          </div>
-        </el-dialog>
-      </div>
-      <!-- route popover -->
-      <div style="margin-right: 5px">
-        <el-popover
-          :visible="routeVisible"
-          :show-arrow="false"
-          trigger="click"
-          :width="350"
-          popper-style="border-radius: 10px;background-color: #305a92;box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
-        >
-          <div style="height: 100px; width: 100%">
-            <el-input
-              v-model="origin"
-              ref="inputRef"
-              placeholder="Search location"
-              class="search-input"
-            >
-              <template #prepend>Origin</template>
-              <template #append>
-                <el-tooltip effect="dark" content="Your Location">
-                  <el-button :icon="Location" @click="accquirePlace"
+          </el-dialog>
+        </div>
+        <!-- route popover -->
+        <div style="margin-right: 5px">
+          <el-popover
+            :visible="routeVisible"
+            :show-arrow="false"
+            trigger="click"
+            :width="350"
+            popper-style="border-radius: 10px;background-color: #305a92;box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+          >
+            <div style="height: 100px; width: 100%">
+              <el-input
+                v-model="origin"
+                ref="inputRef"
+                placeholder="Search location"
+                class="search-input"
+              >
+                <template #prepend>Origin</template>
+                <template #append>
+                  <el-tooltip effect="dark" content="Your Location">
+                    <el-button :icon="Location" @click="accquirePlace"
+                  /></el-tooltip>
+                </template>
+              </el-input>
+              <el-input
+                v-model="destination"
+                placeholder="Search location"
+                class="search-input"
+                ref="inputRefDes"
+                ><template #prepend>&nbspDest.</template>
+                <template #append>
+                  <el-tooltip effect="dark" content="Switch">
+                    <el-button :icon="Sort" @click="switchPlace"
+                  /></el-tooltip>
+                </template>
+              </el-input>
+              <el-button
+                style="
+                  position: relative;
+                  top: 10px;
+                  left: 100px;
+                  border-radius: 4px;
+                  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+                  --el-button-text-color: white;
+                "
+                color="#ff8030"
+                @click="showRoute"
+                >Show Route</el-button
+              >
+            </div>
+            <div style="text-align: right; margin: 0; height: 30px">
+              <el-button
+                style="position: absolute; left: 10px"
+                size="small"
+                color="#305a92"
+                @click="clearRoute"
+                >CLEAR</el-button
+              >
+              <el-button
+                style="position: absolute; right: 10px"
+                size="small"
+                color="#305a92"
+                @click="routeVisible = false"
+                >CANCEL</el-button
+              >
+            </div>
+
+            <template #reference>
+              <div>
+                <el-tooltip effect="dark" content="To This Place">
+                  <el-button
+                    class="add-shadow"
+                    color="#17a25d"
+                    :icon="Bicycle"
+                    circle
+                    size="small"
+                    @click="routeVisible = true"
                 /></el-tooltip>
-              </template>
-            </el-input>
-            <el-input
-              v-model="destination"
-              placeholder="Search location"
-              class="search-input"
-              ref="inputRefDes"
-              ><template #prepend>&nbspDest.</template>
-              <template #append>
-                <el-tooltip effect="dark" content="Switch">
-                  <el-button :icon="Sort" @click="switchPlace"
-                /></el-tooltip>
-              </template>
-            </el-input>
+              </div>
+            </template>
+          </el-popover>
+        </div>
+        <!-- add itinerary -->
+        <div>
+          <el-tooltip effect="dark" content="Add to Itinerary">
             <el-button
-              style="
-                position: relative;
-                top: 10px;
-                left: 100px;
-                border-radius: 4px;
-                box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
-                --el-button-text-color: white;
-              "
-              color="#ff8030"
-              @click="showRoute"
-              >Show Route</el-button
-            >
-          </div>
-          <div style="text-align: right; margin: 0;height: 30px;">
-            <el-button style="position: absolute; left: 10px;" size="small" color="#305a92" @click="clearRoute">CLEAR</el-button>
-            <el-button
-              style="position: absolute; right: 10px;"
+              class="add-shadow"
+              type="warning"
+              :icon="Star"
+              circle
               size="small"
-              color="#305a92"
-              @click="routeVisible = false"
-              >CANCEL</el-button
-            >
-          </div>
-
-          <template #reference>
-            <div>
-              <el-tooltip effect="dark" content="To This Place">
-                <el-button
-                  class="add-shadow"
-                  color="#17a25d"
-                  :icon="Bicycle"
-                  circle
-                  size="small"
-                  @click="routeVisible = true"
-              /></el-tooltip>
-            </div>
-          </template>
-        </el-popover>
+              @click="addItinerary"
+          /></el-tooltip>
+        </div>
       </div>
-      <!-- add itinerary -->
-      <div>
-        <el-tooltip effect="dark" content="Add to Itinerary">
-          <el-button
-            class="add-shadow"
-            type="warning"
-            :icon="Star"
-            circle
-            size="small"
-            @click="addItinerary"
-        /></el-tooltip>
+      <!-- busy level -->
+      <div style="margin-left: 20px; display: flex; flex-direction: row">
+        <div style="position: relative; top: 10px; color: #ff914d; font-size: 20px">
+          Busy Level :
+        </div>
+        &nbsp&nbsp
+        <el-rate
+          style="position: relative; top: 4px"
+          size="large"
+          v-model="value"
+          :icons="icons"
+          :disabled-void-icon="Minus"
+          score-template="{value}"
+          disabled
+          :colors="['#00c763', '#FF9900', '#dc4d4d']"
+        />
       </div>
+      <hr />
+      <!-- introduction -->
+      <div
+        class="introduction"
+        style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 17px"
+      >
+        <p style="color: rgb(232, 232, 232); margin-top: 15px">
+          {{ locationDes }}
+        </p>
+      </div>
+      <!-- graph -->
+      <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+        <v-charts
+          :option="chartOptions"
+          style="width: 80%; height: 200px; overflow: hidden; border-radius: 10px"
+        ></v-charts>
+      </div>
+      <!-- mask -->
+      <div
+        v-show="routeVisible"
+        style="
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+        "
+        :style="{ height: isSmall ? '100%' : '100%' }"
+      ></div>
     </div>
-    <div style="margin-left: 20px; display: flex; flex-direction: row">
-      <div style="position: relative; top: 10px; color: #ff914d; font-size: 20px">Busy Level :</div>
-      &nbsp&nbsp
-      <el-rate
-        style="position: relative; top: 4px"
-        size="large"
-        v-model="value"
-        :icons="icons"
-        :disabled-void-icon="Minus"
-        score-template="{value}"
-        disabled
-        :colors="['#00c763', '#FF9900', '#dc4d4d']"
-      />
-    </div>
-    <hr />
-    <div
-      class="introduction"
-      style="margin-left: 20px; margin-right: 20px; text-align: justify; font-size: 17px"
-    >
-      <p style="color: rgb(232, 232, 232); margin-top: 15px">
-        {{ locationDes }}
-      </p>
-    </div>
-    <!-- mask -->
-    <div
-      v-show="routeVisible"
-      style="
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100%;
-
-        background-color: rgba(0, 0, 0, 0.5);
-      "
-      :style="{ height: isSmall ? '75vh' : '100vh' }"
-    ></div>
-  </div>
+  </el-scrollbar>
 </template>
 
 <script setup>
 import { post, get } from "@/net/axios";
 import { ref, defineProps, watchEffect, onMounted, computed, onUnmounted } from "vue";
 import {
-  SuccessFilled,
-  WarningFilled,
-  CircleCloseFilled,
   Minus,
-  BellFilled,
   Star,
   Bicycle,
   OfficeBuilding,
@@ -674,17 +688,19 @@ const funcBtnStyle = ref({});
 
 watchEffect(() => {
   widthStyle.value = {
+    position:'relative',
     backgroundColor: "#305a92",
     width: props.isSmall ? "100vw" : "500px",
   };
   imgStyle.value = {
     height: props.isSmall ? "170px" : "",
-    objectFit: 'cover'
+    objectFit: "cover",
   };
   funcBtnStyle.value = {
     position: "absolute",
     right: "20px",
     marginTop: "-15px",
+    left:props.isSmall ? "70%" : "80%",
   };
   const ID = locationID.value;
   const url = `/api/poi/${ID}`;
@@ -696,7 +712,7 @@ watchEffect(() => {
     data = res;
     locationName.value = data.name;
     destination.value = data.name;
-    chartOptions.value.title.text = `Busy Level of \n ${locationName.value}\n`;
+    chartOptions.value.title.text = `Busy Level of a Day`;
     destination.value = data.name;
     locationDes.value = data.introduction;
     setDataAllPoiGraph();
@@ -812,7 +828,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    object-fit: cover;
+    width: 300px;
     height: 250px;
     margin: 10px;
     border-radius: 4px;
@@ -844,4 +860,5 @@ onMounted(() => {
 .add-shadow {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
 }
+
 </style>
