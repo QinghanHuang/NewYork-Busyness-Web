@@ -1,7 +1,7 @@
 import axios  from "axios";
 import {ElMessage} from "element-plus";
 
-const defaultError=()=>ElMessage.error("Something wrong, Please contact with admin!");
+const defaultError=()=>ElMessage.error("Something wrong, Please refresh the page or contact with admin!");
 const defaultFailure=(message)=>ElMessage.warning(message)
 
 async function post(url,data,success,failure=defaultFailure,error=defaultError){

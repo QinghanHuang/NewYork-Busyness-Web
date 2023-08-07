@@ -19,6 +19,7 @@ import InfoPage from "../components/welcome/LocInfoPage.vue";
 import WeatherPage from "../components/welcome/WeatherPage.vue";
 import { weatherIconDict } from "../assets/weather/weatherIconDict.js";
 import axios from "axios";
+import router from "@/router";
 
 // define
 const store = useStore();
@@ -628,8 +629,10 @@ onMounted(async () => {
     .then(({ data }) => {
       if (data.success) {
         store.commit("setAuth", true);
+        router.push('/func')
       } else {
         console.log(data);
+        router.push('/')
       }
     });
 
