@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar :native="isSmall"  :noresize="false">
+  <el-scrollbar :native="isSmall" :noresize="false">
     <div :style="widthStyle">
       <!-- image -->
       <el-scrollbar>
@@ -192,6 +192,13 @@
         />
       </div>
       <hr />
+      <!-- graph -->
+      <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+        <v-charts
+          :option="chartOptions"
+          style="width: 93%; height: 200px; overflow: hidden; border-radius: 10px"
+        ></v-charts>
+      </div>
       <!-- introduction -->
       <div
         class="introduction"
@@ -200,13 +207,6 @@
         <p style="color: rgb(232, 232, 232); margin-top: 15px">
           {{ locationDes }}
         </p>
-      </div>
-      <!-- graph -->
-      <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-        <v-charts
-          :option="chartOptions"
-          style="width: 80%; height: 200px; overflow: hidden; border-radius: 10px"
-        ></v-charts>
       </div>
       <!-- mask -->
       <div
@@ -233,7 +233,6 @@ import {
   Bicycle,
   OfficeBuilding,
   Location,
-  Place,
   DataLine,
   Sort,
 } from "@element-plus/icons-vue";
@@ -282,7 +281,6 @@ const dialogStaticVisible = ref(false);
 const echartsShow = ref(false);
 
 let yourLocation;
-let autoOptions;
 let autocomplete;
 let autocompleteDes;
 let marker;
@@ -688,19 +686,20 @@ const funcBtnStyle = ref({});
 
 watchEffect(() => {
   widthStyle.value = {
-    position:'relative',
+    position: "relative",
     backgroundColor: "#305a92",
     width: props.isSmall ? "100vw" : "500px",
   };
   imgStyle.value = {
     height: props.isSmall ? "170px" : "",
+    width: props.isSmall ? "300px" : "",
     objectFit: "cover",
   };
   funcBtnStyle.value = {
     position: "absolute",
     right: "20px",
     marginTop: "-15px",
-    left:props.isSmall ? "75%" : "80%",
+    left: props.isSmall ? "75%" : "80%",
   };
   const ID = locationID.value;
   const url = `/api/poi/${ID}`;
@@ -828,7 +827,6 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 300px;
     height: 250px;
     margin: 10px;
     border-radius: 4px;
@@ -860,5 +858,4 @@ onMounted(() => {
 .add-shadow {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
 }
-
 </style>

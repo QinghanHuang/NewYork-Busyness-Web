@@ -5,8 +5,6 @@ import {
   Expand,
   Minus,
   Plus,
-  DArrowRight,
-  Close,
   ArrowRightBold,
   ArrowDownBold,
 } from "@element-plus/icons-vue";
@@ -43,7 +41,6 @@ const directionsDisplay = new google.maps.DirectionsRenderer();
 let infoWindowList = [];
 let currTime;
 let weatherCurData;
-let weatherForDate;
 let geocoder;
 let map;
 let marker;
@@ -71,13 +68,6 @@ const weatherWindowPlacement = ref(null);
 const openSideBarButtonStyle = ref({});
 const titleBarStyle = ref({});
 const infoWindowCloseBtnStyle = ref({});
-const colorDict = {
-  1: "green",
-  2: "blue",
-  3: "yellow",
-  4: "orange",
-  5: "red",
-};
 const iconDict = {
   1: "/1.svg",
   2: "/2.svg",
@@ -629,10 +619,10 @@ onMounted(async () => {
     .then(({ data }) => {
       if (data.success) {
         store.commit("setAuth", true);
-        router.push('/func')
+        router.push("/func");
       } else {
         console.log(data);
-        router.push('/')
+        router.push("/");
       }
     });
 
@@ -645,10 +635,6 @@ onMounted(async () => {
 
   // side bar outside click
   document.addEventListener("click", outsideClickFold);
-
-  // side bar effect
-  // store.commit("setSideBarShow", true);
-  // showOverlay.value = true;
 
   // map options
   mapOptions = {
@@ -698,6 +684,7 @@ onMounted(async () => {
     }
 
     clear();
+    
     // If the place has a geometry, then present it on a map.
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
@@ -800,34 +787,31 @@ onUnmounted(() => {
       </div>
 
       <!-- busy level forecast slider -->
-        <div
-          style="position: absolute"
-          :style="sliderStyle"
+      <div style="position: absolute" :style="sliderStyle">
+        <el-dropdown
+          style="color: black; position: absolute; top: 9px; font-size: 17px; left: 10px"
         >
-          <el-dropdown
-            style="color: black; position: absolute; top: 9px; font-size: 17px; left: 10px"
-          >
-            {{ todayDate.slice(5) }}
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item
-                  v-for="date in futureDates"
-                  :key="date"
-                  @click="handleDateSelect(date)"
-                  >{{ date }}</el-dropdown-item
-                >
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <el-slider
-            v-model="forecastTime"
-            vertical
-            :max="23"
-            :format-tooltip="formatTooltip"
-            @input="sliderTimeChange"
-            :marks="sliderTimeShow"
-          />
-        </div>
+          {{ todayDate.slice(5) }}
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item
+                v-for="date in futureDates"
+                :key="date"
+                @click="handleDateSelect(date)"
+                >{{ date }}</el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-slider
+          v-model="forecastTime"
+          vertical
+          :max="23"
+          :format-tooltip="formatTooltip"
+          @input="sliderTimeChange"
+          :marks="sliderTimeShow"
+        />
+      </div>
       <!-- open side bar button -->
       <div ref="openSideBarRef">
         <el-button
