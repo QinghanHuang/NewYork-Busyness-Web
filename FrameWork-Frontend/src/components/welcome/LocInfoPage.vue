@@ -700,7 +700,7 @@ watchEffect(() => {
     position: "absolute",
     right: "20px",
     marginTop: "-15px",
-    left:props.isSmall ? "70%" : "80%",
+    left:props.isSmall ? "75%" : "80%",
   };
   const ID = locationID.value;
   const url = `/api/poi/${ID}`;
