@@ -55,13 +55,14 @@
       </el-form>
       <div class="choose-avatar" v-if="chooseAvatarShow">
         <div class="avatar-container">
-          <img
-            v-for="image in images"
-            :key="image.id"
-            :src="image.url"
-            :class="{ 'image-item': true, selected: image.id === selectedImageId }"
-            @click="selectImage(image.id)"
-          />
+          <el-scrollbar>
+            <img
+              v-for="image in images"
+              :key="image.id"
+              :src="image.url"
+              :class="{ 'image-item': true, selected: image.id === selectedImageId }"
+              @click="selectImage(image.id)"
+          /></el-scrollbar>
         </div>
         <el-button
           style="position: relative; left: 50%; transform: translate(-50%, 50%)"
