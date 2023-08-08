@@ -337,7 +337,6 @@ const geocode = (request) => {
 };
 
 // ----------------------login auth fail----------------------
-
 const isLoginFail = () => {
   if (!computed(() => store.state.auth).value) {
     ElMessage.warning("Please Login");
@@ -348,6 +347,7 @@ const isLoginFail = () => {
   return false;
 };
 const throttledIsLoginFail = debounce(isLoginFail, 100);
+
 // ----------------------slider function----------------------
 const sliderTimeChange = () => {
   if (throttledIsLoginFail()) return;

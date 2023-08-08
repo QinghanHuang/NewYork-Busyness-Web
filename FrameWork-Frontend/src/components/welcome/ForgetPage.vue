@@ -176,10 +176,10 @@ const doReset = () => {
         >
       </div>
     </div>
-    <div style="text-align: center; margin: 20px 20px; height: 100%" v-if="active === 1">
+    <div style="text-align: center; margin: 40px 20px; height: 100%" v-if="active === 1">
       <div style="font-size: 25px; font-weight: bold; color: #ff914d;">Reset Password</div>
-      <div style="font-size: 14px; color: grey">Please Input New Password</div>
-      <div style="margin-top: 50px">
+      <div style="font-size: 14px; color: rgb(227, 227, 227)">Please Input New Password</div>
+      <div style="margin-top: 30px">
         <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
           <el-form-item prop="password">
             <el-input
