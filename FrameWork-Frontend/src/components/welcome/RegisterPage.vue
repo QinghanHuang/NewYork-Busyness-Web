@@ -56,11 +56,11 @@ const rules = {
     { required: true, message: "Please input email address", trigger: "blur" },
     {
       type: "email",
-      message: "Email address illegal",
+      message: " Not Valid Email",
       trigger: ["blur", "change"],
     },
   ],
-  code: [{ required: true, message: "Please input verify code", trigger: "blur" }],
+  code: [{ required: true, message: "Please input verification code", trigger: "blur" }],
 };
 const isEmailValid = ref(false);
 const formRef = ref();
@@ -180,7 +180,7 @@ const validateEmail = () => {
                 v-model="form.code"
                 type="text"
                 maxlength="6"
-                placeholder="Input Verify Code"
+                placeholder="Input Verification Code"
               >
                 <template #prefix>
                   <el-icon>

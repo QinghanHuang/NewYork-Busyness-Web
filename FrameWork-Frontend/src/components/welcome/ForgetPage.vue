@@ -29,11 +29,11 @@ const rules = {
     { required: true, message: "Please input email address", trigger: "blur" },
     {
       type: "email",
-      message: "Email address illegal",
+      message: "Not Valid Email",
       trigger: ["blur", "change"],
     },
   ],
-  code: [{ required: true, message: "Please input verify code", trigger: "blur" }],
+  code: [{ required: true, message: "Please input verification code", trigger: "blur" }],
   password: [
     { required: true, message: "Please input password", trigger: "blur" },
     {
@@ -172,7 +172,7 @@ const doReset = () => {
       </el-form>
       <div style="margin-top: 70px">
         <el-button @click="startReset()" style="width: 270px" color="#FF914d" plain
-          >Begin Reset</el-button
+          >Password Reset</el-button
         >
       </div>
     </div>
