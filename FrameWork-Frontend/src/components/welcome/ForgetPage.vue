@@ -29,11 +29,11 @@ const rules = {
     { required: true, message: "Please input email address", trigger: "blur" },
     {
       type: "email",
-      message: "Email address illegal",
+      message: "Not Valid Email",
       trigger: ["blur", "change"],
     },
   ],
-  code: [{ required: true, message: "Please input verify code", trigger: "blur" }],
+  code: [{ required: true, message: "Please input verification code", trigger: "blur" }],
   password: [
     { required: true, message: "Please input password", trigger: "blur" },
     {
@@ -172,14 +172,14 @@ const doReset = () => {
       </el-form>
       <div style="margin-top: 70px">
         <el-button @click="startReset()" style="width: 270px" color="#FF914d" plain
-          >Begin Reset</el-button
+          >Password Reset</el-button
         >
       </div>
     </div>
-    <div style="text-align: center; margin: 200px 20px; height: 100%" v-if="active === 1">
-      <div style="font-size: 25px; font-weight: bold">Reset Password</div>
-      <div style="font-size: 14px; color: grey">Please Input New Password</div>
-      <div style="margin-top: 50px">
+    <div style="text-align: center; margin: 40px 20px; height: 100%" v-if="active === 1">
+      <div style="font-size: 25px; font-weight: bold; color: #ff914d;">Reset Password</div>
+      <div style="font-size: 14px; color: rgb(227, 227, 227)">Please Input New Password</div>
+      <div style="margin-top: 30px">
         <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
           <el-form-item prop="password">
             <el-input

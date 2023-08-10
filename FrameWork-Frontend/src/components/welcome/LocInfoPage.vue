@@ -148,7 +148,7 @@
 
             <template #reference>
               <div>
-                <el-tooltip effect="dark" content="To This Place">
+                <el-tooltip effect="dark" content="Create Route">
                   <el-button
                     class="add-shadow"
                     color="#17a25d"

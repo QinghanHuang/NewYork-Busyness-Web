@@ -11,7 +11,7 @@
           :size="100"
           :src="avatarDict[form.avatar]"
         />
-        <p class="upload-text" @click="chooseAvatar">Click here choose your avatar</p>
+        <p class="upload-text" @click="chooseAvatar">Edit Avatar</p>
       </div>
       <el-divider />
       <el-form :model="form" label-width="100px" class="form">
@@ -55,13 +55,14 @@
       </el-form>
       <div class="choose-avatar" v-if="chooseAvatarShow">
         <div class="avatar-container">
-          <img
-            v-for="image in images"
-            :key="image.id"
-            :src="image.url"
-            :class="{ 'image-item': true, selected: image.id === selectedImageId }"
-            @click="selectImage(image.id)"
-          />
+          <el-scrollbar>
+            <img
+              v-for="image in images"
+              :key="image.id"
+              :src="image.url"
+              :class="{ 'image-item': true, selected: image.id === selectedImageId }"
+              @click="selectImage(image.id)"
+          /></el-scrollbar>
         </div>
         <el-button
           style="position: relative; left: 50%; transform: translate(-50%, 50%)"
