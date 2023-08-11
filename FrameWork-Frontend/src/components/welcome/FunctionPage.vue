@@ -38,7 +38,7 @@
       "
     >
       <h1 class="itinerary">Itinerary</h1>
-      <p class="instruction">Choose Location & Time</p>
+      <p class="instruction"></p>
     </div>
     <div class="func">
       <el-scrollbar>
@@ -300,7 +300,7 @@ const toggleSelection = (column) => {
 .itinerary {
   position: relative;
   top: 10px;
-  left: 2px;
+  left: 8px;
 }
 .instruction {
   color: rgb(238, 238, 238);
