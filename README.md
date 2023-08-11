@@ -1,9 +1,20 @@
-# Function for now
-## Authorization
-### 1.Login
-### 2.Register
-### 3.Forget Password
-### 4.Remember Me
-### 5.Router
-### 6.Input validation
-###
+# New York Busyness Project-- CityPulse Manhattan
+
+Tourism as an industry, plays a vital role in the global economy, with an estimated 9.8\% of the world’s economy and 7\% of its exports attributable to the industry. Encouraging inbound travel also promotes the local economy significantly in numerous ways, such as bolstering foreign exchange reserves by encouraging market competition, and attracting new infrastructural investments. Furthermore, the industry also stimulates commercial growth, creates employment opportunities and  boost the overall income level of local residents. Additionally, as the economy grows, the expansion of the tourism sector produces favourable externalities that could spur additional expansion of international travel.
+
+However, tourism could potentially have negative impacts, particularly when the number of tourist or visitors in a location exceeds its carrying capacity, leading to a phenomenon called overtourism. This phenomenon can have adverse effects on the quality of life for residents and  affect overall tourist experience. Overtourism is also detrimental to tourist loyalty, the destination’s economy, tourist’s overall satisfaction, revisit intentions, and can be an hazardous to the environment. 
+
+New York city is one of the world’s most famous financial and cultural hubs, and like with many other urban centres, it also grapples with the effects of overtourism, particularly in its busiest borough, Manhattan. The city is currently ranked as the most populous and most visited city in the United State of America, with an estimated 8.8 million residents and 10 million visitors annually. Often tagged the city “that never sleeps”, the city is constantly beaming with activities, and navigating the city could be overwhelming for tourist and residents, inadvertently limiting their ability to fully enjoy and maximise their experiences. Hence providing the city’s tourists or inhabitant with an application that predicts busyness of various tourist attractions, should promote the appeal and accessibility of these attractions, and enhance the experiences and overall satisfaction of the city’s tourist.
+
+Our intended application, City Pulse Manhattan, should be able to provide real-time predictions or how congested various Points of Interest (POIs) are around the city. Due to the scale, density and dynamism of activities in the city, its inhabitants are heavily reliant on public transit for mobility, with approximately 56\% of the city’s workforce relying on it for their daily commute. Therefore leveraging public transport systems data, particularly the Yellow Taxi data, could provide real-time insights on location based activities clusters. The application in its initial stage would be focused on the Manhattan borough, where these taxis are mainly clustered. Although taxis are not the most popular means of public transportation and only act as a supplement, they are far more flexible and accessible since they do not require as much infrastructural requirements like bus or train stations. Also, the scale of taxi use in the city is still huge. In 2019, for instance daily taxi trips where estimated to be over a million trips on average daily. 
+
+The overall aim of the application is to alleviate overtourism induced challenges, by predicting the busyness levels at various POIs and locations within Manhattan. This should help tourist and residents effectively and efficiently in their decision making. The application could potentially support policy makers as well, by helping them identify tourist-related pressure zones, which could help provide more sustainable urban planning or policies. In essence, the application's purpose is to promote a more balanced coexistence between tourism expansion and the quality of life for Manhattan's residents, resulting in a more joyful and environmentally responsible travel experience.
+<img width="1511" alt="Screenshot 2023-08-11 at 16 24 56" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/8879ad00-0edd-40b1-9a1f-6304117a105a">
+<img width="1512" alt="Screenshot 2023-08-11 at 16 25 05" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/10397290-3ae6-432b-b6df-85327a972794">
+<img width="1512" alt="Screenshot 2023-08-11 at 16 25 22" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/e96a1137-f4bd-45b4-8f9c-daf01619fc4c">
+<img width="1503" alt="Screenshot 2023-08-11 at 16 25 33" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/3f9fd9d5-e3cf-437d-be3b-e23512a280fb">
+<img width="1512" alt="Screenshot 2023-08-11 at 16 26 17" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/9304a5d8-95e7-4069-839c-3a526cd1e140">
+<img width="1511" alt="Screenshot 2023-08-11 at 16 28 57" src="https://github.com/QinghanHuang/NewYork-Busyness-Web/assets/118179558/f98ff7f5-ac73-4250-a80f-57746a2f3a6a">
+
+
+
